@@ -41,6 +41,7 @@ export function generateCode(graph: LGraph) {
     let code = "";
 
     sorted.forEach((node) => {
+        // @ts-expect-error
         const c = node.onGenerateCode(context);
         code += `${c}\n`;
     })

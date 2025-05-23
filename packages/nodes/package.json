@@ -16,5 +16,12 @@
     },
     "dependencies": {
         "@disflow-team/utils": "workspace:^"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js"
+        }
     }
 }

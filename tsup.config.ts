@@ -4,7 +4,8 @@ const DEFAULT_OPTIONS: Options = {
     format: ["cjs", "esm"],
     dts: true,
     entry: ['./src/index.ts'],
-    outDir: "./dist"
+    outDir: "./dist",
+    skipNodeModulesBundle: true
 } as const
 
 export function defineConfig(opts: Options) {
