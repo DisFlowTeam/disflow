@@ -31,6 +31,7 @@ __metadata:
   dependencies:
     "@disflow-team/code-gen": "workspace:^"
     "@disflow-team/tsconfig": "workspace:^"
+    "@disflow-team/utils": "workspace:^"
     tsup: "npm:^8.5.0"
   languageName: unknown
   linkType: soft
