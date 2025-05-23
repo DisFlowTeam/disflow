@@ -1,0 +1,4 @@
+{
+    "extends": "@disflow-team/tsconfig/tsconfig.json",
+    "include": ["./src/**/*.ts"]
+}

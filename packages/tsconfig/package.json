@@ -1,0 +1,4 @@
+{
+    "name": "@disflow-team/tsconfig",
+    "description": "TypeScript configuration for DisFlow packages."
+}

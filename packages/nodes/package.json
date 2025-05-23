@@ -1,0 +1,8 @@
+{
+    "name": "@disflow-team/nodes",
+    "description": "All the nodes used in DisFlow. Also provide more abilities to litegraph default nodes.",
+    "devDependencies": {
+        "@disflow-team/tsconfig": "workspace:^",
+        "tsup": "^8.5.0"
+    }
+}

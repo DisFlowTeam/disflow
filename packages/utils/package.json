@@ -1,0 +1,8 @@
+{
+    "name": "@disflow-team/utils",
+    "description": "A set of utilities used by DisFlow",
+    "devDependencies": {
+        "@disflow-team/tsconfig": "workspace:^",
+        "tsup": "^8.5.0"
+    }
+}
