@@ -5,10 +5,10 @@
     "name": "DisFlow Team"
   },
   "scripts": {
-    "start": "turbo start",
     "build": "turbo build",
     "test": "turbo test",
-    "dev": "turbo dev"
+    "dev": "turbo build --filter=!web-app && yarn workspace web-app dev",
+    "build:packages": "turbo build --filter=!web-app"
   },
   "devDependencies": {
     "tsup": "^8.5.0",

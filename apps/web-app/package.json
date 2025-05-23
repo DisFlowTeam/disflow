@@ -16,5 +16,11 @@
     "svelte-check": "^4.1.6",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "@disflow-team/code-gen": "workspace:^",
+    "@disflow-team/nodes": "workspace:^",
+    "@disflow-team/utils": "workspace:^",
+    "litegraph.js": "^0.7.18"
   }
 }

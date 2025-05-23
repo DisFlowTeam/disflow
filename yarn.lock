@@ -15,19 +15,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@disflow-team/code-gen@workspace:packages/generator":
+"@disflow-team/code-gen@workspace:^, @disflow-team/code-gen@workspace:packages/generator":
   version: 0.0.0-use.local
   resolution: "@disflow-team/code-gen@workspace:packages/generator"
   dependencies:
     "@disflow-team/tsconfig": "workspace:^"
+    litegraph.js: "npm:^0.7.18"
     tsup: "npm:^8.5.0"
   languageName: unknown
   linkType: soft
 
-"@disflow-team/nodes@workspace:packages/nodes":
+"@disflow-team/nodes@workspace:^, @disflow-team/nodes@workspace:packages/nodes":
   version: 0.0.0-use.local
   resolution: "@disflow-team/nodes@workspace:packages/nodes"
   dependencies:
+    "@disflow-team/code-gen": "workspace:^"
     "@disflow-team/tsconfig": "workspace:^"
     tsup: "npm:^8.5.0"
   languageName: unknown
@@ -39,11 +41,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@disflow-team/utils@workspace:packages/utils":
+"@disflow-team/utils@workspace:^, @disflow-team/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@disflow-team/utils@workspace:packages/utils"
   dependencies:
     "@disflow-team/tsconfig": "workspace:^"
+    litegraph.js: "npm:^0.7.18"
     tsup: "npm:^8.5.0"
   languageName: unknown
   linkType: soft
@@ -1105,6 +1108,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"litegraph.js@npm:^0.7.18":
+  version: 0.7.18
+  resolution: "litegraph.js@npm:0.7.18"
+  checksum: 10c0/c77edcf19fa4031115e54130a58a82d4e66d44cb81ff002b5db90f381856f08129f9fba7568bf5c456b25542e24d8192737cae34aead14eb62de402de2cad0ad
+  languageName: node
+  linkType: hard
+
 "load-tsconfig@npm:^0.2.3":
   version: 0.2.5
   resolution: "load-tsconfig@npm:0.2.5"
@@ -2079,8 +2089,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "web-app@workspace:apps/web-app"
   dependencies:
+    "@disflow-team/code-gen": "workspace:^"
+    "@disflow-team/nodes": "workspace:^"
+    "@disflow-team/utils": "workspace:^"
     "@sveltejs/vite-plugin-svelte": "npm:^5.0.3"
     "@tsconfig/svelte": "npm:^5.0.4"
+    litegraph.js: "npm:^0.7.18"
     svelte: "npm:^5.28.1"
     svelte-check: "npm:^4.1.6"
     typescript: "npm:~5.8.3"

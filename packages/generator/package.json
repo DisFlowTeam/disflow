@@ -1,8 +1,17 @@
 {
     "name": "@disflow-team/code-gen",
     "description": "A tiny, 0 dependency module to add code generation capabilities to litegraph.js. Used alongside @disflow-team/nodes",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist/"
+    ],
     "devDependencies": {
         "@disflow-team/tsconfig": "workspace:^",
+        "litegraph.js": "^0.7.18",
         "tsup": "^8.5.0"
+    },
+    "scripts": {
+        "build": "tsup"
     }
 }

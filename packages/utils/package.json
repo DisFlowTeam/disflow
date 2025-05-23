@@ -1,8 +1,17 @@
 {
     "name": "@disflow-team/utils",
     "description": "A set of utilities used by DisFlow",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist/"
+    ],
     "devDependencies": {
         "@disflow-team/tsconfig": "workspace:^",
+        "litegraph.js": "^0.7.18",
         "tsup": "^8.5.0"
+    },
+    "scripts": {
+        "build": "tsup --config ./tsup.config.ts"
     }
 }
