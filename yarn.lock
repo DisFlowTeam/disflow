@@ -25,6 +25,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@disflow-team/data@workspace:packages/data":
+  version: 0.0.0-use.local
+  resolution: "@disflow-team/data@workspace:packages/data"
+  dependencies:
+    tsup: "npm:^8.5.0"
+  languageName: unknown
+  linkType: soft
+
 "@disflow-team/nodes@workspace:^, @disflow-team/nodes@workspace:packages/nodes":
   version: 0.0.0-use.local
   resolution: "@disflow-team/nodes@workspace:packages/nodes"

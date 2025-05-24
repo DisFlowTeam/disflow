@@ -1,0 +1,17 @@
+{
+    "name": "@disflow-team/data",
+    "description": "Handles DisFlow's data flow.",
+    "scripts": {
+        "build": "tsup"
+    },
+    "devDependencies": {
+        "tsup": "^8.5.0"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js"
+        }
+    }
+}
