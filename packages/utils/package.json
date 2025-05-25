@@ -12,7 +12,10 @@
         "tsup": "^8.5.0"
     },
     "scripts": {
-        "build": "tsup --config ./tsup.config.ts"
+        "build": "tsup --config ./tsup.config.ts",
+        "lint": "eslint . --ext .ts,.js",
+        "prettier": "prettier --write .",
+        "prettier:check": "prettier --check ."
     },
     "exports": {
         ".": {

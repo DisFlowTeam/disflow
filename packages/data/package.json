@@ -2,7 +2,10 @@
     "name": "@disflow-team/data",
     "description": "Handles DisFlow's data flow.",
     "scripts": {
-        "build": "tsup"
+        "build": "tsup",
+        "lint": "eslint . --ext .ts,.js",
+        "prettier": "prettier --write .",
+        "prettier:check": "prettier --check ."
     },
     "devDependencies": {
         "tsup": "^8.5.0"
