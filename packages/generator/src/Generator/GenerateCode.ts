@@ -1,7 +1,8 @@
 import type { LGraph } from "litegraph.js";
 // this is wacky ngl ...
-import type { BaseNode } from "../../../nodes/src/nodes/BaseNode";
+import type { BaseNode } from "../nodes";
 import { GenerationContext } from "./GenerationContext";
+import { BaseControlFlowNode } from "../nodes/Base/BaseControlFlowNode";
 
 function sortTopologically(graph: LGraph) {
     const visited = new Set<BaseNode>();
@@ -36,14 +37,23 @@ function sortTopologically(graph: LGraph) {
 }
 
 export function generateCode(graph: LGraph) {
-    const sorted = sortTopologically(graph)
-    const context = new GenerationContext() as unknown as Parameters<typeof BaseNode.prototype.onGenerateCode>[0];
-    let code = "";
+    const sorted = sortTopologically(graph);
+    const visted = new Set<BaseNode>();
+    const context = new GenerationContext();
+    let code: { i: number, c: string }[] = [];
 
-    sorted.forEach((node) => {
-        const c = node.onGenerateCode(context);
-        code += `${c}\n`;
+    sorted.forEach((node, i) => {
+        if(visted.has(node)) return;
+        if(!(node instanceof BaseControlFlowNode)) return;
+
+        code.push({ i, c: node.onGenerateCode(context, visted) })
     })
 
-    return code.trim();
+    sorted.forEach((node, i) => {
+        if(visted.has(node)) return;
+        const c = node.onGenerateCode(context, visted);
+        code.push({ i, c })
+    })
+
+    return code.sort((a, b) => a.i - b.i).map(v => v.c).join("\n").trim();
 }

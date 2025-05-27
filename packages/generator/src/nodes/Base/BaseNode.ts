@@ -1,5 +1,5 @@
 import { type INodeOutputSlot, LGraphNode } from "litegraph.js";
-import type { GenerationContext } from "@disflow-team/code-gen"
+import type { GenerationContext } from "../../Generator";
 
 export interface BaseNode {
     onOutputAdded?: (output: INodeOutputSlot) => any;
@@ -54,5 +54,5 @@ export abstract class BaseNode extends LGraphNode {
      * Called when the node is needed to generate code
      * @param ctx The context of the current generation
      */
-    abstract onGenerateCode(ctx: GenerationContext): string;
+    abstract onGenerateCode(ctx: GenerationContext, visited: Set<BaseNode>): string;
 }
