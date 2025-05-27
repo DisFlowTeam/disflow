@@ -37,11 +37,10 @@ function sortTopologically(graph: LGraph) {
 
 export function generateCode(graph: LGraph) {
     const sorted = sortTopologically(graph)
-    const context = new GenerationContext();
+    const context = new GenerationContext() as unknown as Parameters<typeof BaseNode.prototype.onGenerateCode>[0];
     let code = "";
 
     sorted.forEach((node) => {
-        // @ts-expect-error
         const c = node.onGenerateCode(context);
         code += `${c}\n`;
     })
