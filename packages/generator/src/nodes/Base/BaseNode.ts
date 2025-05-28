@@ -39,7 +39,7 @@ export abstract class BaseNode extends LGraphNode {
 
                         if(!this.graph) this.graph = getGraph();
                         if (flowOut !== -1) this.removeOutput(flowOut)
-                        if (flowIn !== -1) this.inputs.splice(flowIn, 1)
+                        if (flowIn !== -1) this.removeInput(flowIn)
                     } else {
                         this.addInput("flow in", "flow");
                         this.addOutput("flow out", "flow");
