@@ -1,13 +1,52 @@
-import { type INodeOutputSlot, LGraphNode } from "litegraph.js";
+import { INodeInputSlot, type INodeOutputSlot, LGraphNode } from "litegraph.js";
 import type { GenerationContext } from "../../Generator";
+import { getGraph } from "@disflow-team/utils"
 
-export interface BaseNode {
-    onOutputAdded?: (output: INodeOutputSlot) => any;
+export enum FlowMode {
+    Off,
+    On,
+    Dynamic
+}
+
+declare module "litegraph.js" {
+    interface LGraphNode {
+        onOutputAdded: (output: INodeOutputSlot) => any;
+        onInputAdded: (input: INodeInputSlot) => any;
+    }
 }
 
 export abstract class BaseNode extends LGraphNode {
+    includeFlow: FlowMode = FlowMode.On;
+    private inputHandler: undefined | LGraphNode['onInputAdded'];
+    private outputHandler: undefined | LGraphNode['onOutputAdded'];
+
     constructor() {
         super();
+        if (this.includeFlow === FlowMode.On || this.includeFlow === FlowMode.Dynamic) {
+            this.addInput("flow in", "flow");
+            this.addOutput("flow out", "flow");
+
+            if (this.includeFlow === FlowMode.Dynamic) {
+                if (!this.properties) {
+                    this.properties = {};
+                }
+                this.properties.__flowState = true;
+                this.addWidget("toggle", "Toggle Flow", true, (v: boolean) => {
+                    this.properties.__flowState = v;
+                    if (!v) {
+                        const flowOut = this.outputs.findIndex(v => v.name === "flow out");
+                        const flowIn = this.inputs.findIndex(v => v.name === "flow in");
+
+                        if(!this.graph) this.graph = getGraph();
+                        if (flowOut !== -1) this.removeOutput(flowOut)
+                        if (flowIn !== -1) this.inputs.splice(flowIn, 1)
+                    } else {
+                        this.addInput("flow in", "flow");
+                        this.addOutput("flow out", "flow");
+                    }
+                })
+            }
+        }
         this.builder();
         this.serialize_widgets = true;
     }
@@ -15,34 +54,56 @@ export abstract class BaseNode extends LGraphNode {
     static category: string;
     static title: string;
 
-    static buildName() {
-        return `${this.category}/${this.title}`
-    }
-
-    /**
-     * Set the name of the node
-     * @param name the name of the node
-     */
-    protected setName(name: string) {
+    setName(name: string) {
         this.title = name;
         return this;
     }
 
-    protected insertOutput(index: number, name: string, type: string | -1, extraInfo?: INodeOutputSlot) {
-        if(index > this.outputs.length - 1) throw new Error(`Cannot insert there. Output length is is only ${this.outputs.length}. Maxmium insert is ${this.outputs.length - 1}.`)
-        const output: INodeOutputSlot =  { name, type, links: null };
-        if(extraInfo) {
-            for (const i in extraInfo) {
-                // @ts-expect-error
-                output[i] = extraInfo[i];
-            }
+    static buildName() {
+        return `${this.category}/${this.title}`
+    }
+
+    protected setInputAddedHandler(cb: LGraphNode['onInputAdded']) {
+        this.inputHandler = cb;
+    }
+
+    protected setOutputAddedHandler(cb: LGraphNode['onOutputAdded']) {
+        this.outputHandler = cb;
+    }
+
+    onOutputAdded = (output: INodeOutputSlot) => {
+        if (this.includeFlow === FlowMode.Off) {
+            if (this.outputHandler) this.outputHandler(output);
+            return;
         }
 
-        if(!this.outputs) this.outputs = [];
-        this.outputs.splice(index, 0, output);
+        if (output.name === "flow out" && output.type === "flow") return;
+        if (this.includeFlow === FlowMode.On || (this.includeFlow === FlowMode.Dynamic && this.properties.__flowState)) {
+            const flowOut = this.outputs.findIndex(v => v.name === "flow out" && v.type === "flow");
+            if (flowOut !== -1) {
+                if(!this.graph) this.graph = getGraph();
+                this.removeOutput(flowOut);
+            }
+            this.addOutput("flow out", "flow");
+            if (this.outputHandler) this.outputHandler(output);
+        }
+    };
 
-        if(this.onOutputAdded) {
-            this.onOutputAdded(output)
+    onInputAdded = (input: INodeInputSlot) => {
+        if (this.includeFlow === FlowMode.Off) {
+            if (this.inputHandler) this.inputHandler(input);
+            return;
+        }
+
+        if (input.name === "flow in" && input.type === "flow") return;
+        if (this.includeFlow === FlowMode.On || (this.includeFlow === FlowMode.Dynamic && this.properties.__flowState)) {
+            const flowIn = this.inputs.findIndex(v => v.name === "flow in");
+            if (flowIn !== -1) {
+                if(!this.graph) this.graph = getGraph();
+                this.removeInput(flowIn);
+            }
+            this.addInput("flow in", "flow");
+            if (this.inputHandler) this.inputHandler(input);
         }
     }
 

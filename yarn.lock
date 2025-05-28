@@ -20,6 +20,7 @@ __metadata:
   resolution: "@disflow-team/code-gen@workspace:packages/generator"
   dependencies:
     "@disflow-team/tsconfig": "workspace:^"
+    "@disflow-team/utils": "workspace:^"
     litegraph.js: "npm:^0.7.18"
     tsup: "npm:^8.5.0"
   languageName: unknown
@@ -29,17 +30,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@disflow-team/data@workspace:packages/data"
   dependencies:
-    tsup: "npm:^8.5.0"
-  languageName: unknown
-  linkType: soft
-
-"@disflow-team/nodes@workspace:packages/nodes":
-  version: 0.0.0-use.local
-  resolution: "@disflow-team/nodes@workspace:packages/nodes"
-  dependencies:
-    "@disflow-team/code-gen": "workspace:^"
-    "@disflow-team/tsconfig": "workspace:^"
-    "@disflow-team/utils": "workspace:^"
     tsup: "npm:^8.5.0"
   languageName: unknown
   linkType: soft

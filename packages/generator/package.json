@@ -20,5 +20,8 @@
             "import": "./dist/index.mjs",
             "require": "./dist/index.js"
         }
+    },
+    "dependencies": {
+        "@disflow-team/utils": "workspace:^"
     }
 }
