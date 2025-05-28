@@ -23,7 +23,7 @@ export abstract class BaseControlFlowNode extends BaseNode {
             code += child.onGenerateCode(ctx, visited);
         }
 
-        return code;
+        return code.split("\n").map(v => `\t${v}`).join("\n");
     }
 
     private collectBranchNodes(node: BaseNode, branches: Set<BaseNode>, visited: Set<BaseNode>) {

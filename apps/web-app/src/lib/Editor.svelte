@@ -2,7 +2,16 @@
     import { createEditor } from "@disflow-team/utils";
     import { onMount } from "svelte";
     import Sidebar from "./Sidebar/Sidebar.svelte";
-    import "litegraph.js/css/litegraph.css"
+    import "litegraph.js/css/litegraph.css";
+    import { LiteGraph } from "litegraph.js"
+    import * as NodesObj from "../lib/Nodes";
+
+    const Nodes = Object.values(NodesObj);
+
+    LiteGraph.clearRegisteredTypes();
+    for(const Node of Nodes) {
+        LiteGraph.registerNodeType(Node.buildName(), Node);
+    }
 
     let canvas: HTMLCanvasElement;
 
