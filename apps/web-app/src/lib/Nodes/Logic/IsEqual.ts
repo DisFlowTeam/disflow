@@ -1,10 +1,11 @@
-import { BaseNode, type GenerationContext } from "@disflow-team/code-gen";
+import { BaseNode, FlowMode, type GenerationContext } from "@disflow-team/code-gen";
 
 export class EqualNode extends BaseNode {
     static title: string = "equal";
     static category: string = "Logic";
 
     builder(): void {
+        this.includeFlow = FlowMode.Dynamic
         this.setName("equal");
         this.addInput("first", "*");
         this.addInput("second", "*");
@@ -22,6 +23,6 @@ export class EqualNode extends BaseNode {
 
         const name = ctx.requestUniqueName(this);
 
-        return `const ${name} = ${fName || "false"} === ${sName || "false"}`
+        return `const ${name} = ${fName || "false"} === ${sName || "false"};`
     }
 }

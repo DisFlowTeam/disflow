@@ -22,9 +22,12 @@ export abstract class BaseNode extends LGraphNode {
 
     constructor() {
         super();
+        this.builder();
         if (this.includeFlow === FlowMode.On || this.includeFlow === FlowMode.Dynamic) {
-            this.addInput("flow in", "flow");
-            this.addOutput("flow out", "flow");
+            const flowOut = this.outputs.findIndex(v => v.name === "flow out");
+            const flowIn = this.inputs.findIndex(v => v.name === "flow in");
+            if (flowIn === -1) this.addInput("flow in", "flow");
+            if (flowOut === -1) this.addOutput("flow out", "flow");
 
             if (this.includeFlow === FlowMode.Dynamic) {
                 if (!this.properties) {
@@ -47,7 +50,6 @@ export abstract class BaseNode extends LGraphNode {
                 })
             }
         }
-        this.builder();
         this.serialize_widgets = true;
     }
 
