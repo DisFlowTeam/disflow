@@ -3,12 +3,16 @@
     "description": "Handles DisFlow's data flow.",
     "scripts": {
         "build": "tsup",
-        "lint": "eslint . --ext .ts,.js",
+        "lint": "npx --no eslint src --ext .ts --fix",
         "prettier": "prettier --write .",
         "prettier:check": "prettier --check ."
     },
     "devDependencies": {
-        "tsup": "^8.5.0"
+        "@eslint/js": "^9.28.0",
+        "eslint": "^9.28.0",
+        "tsup": "^8.5.0",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.33.0"
     },
     "exports": {
         ".": {

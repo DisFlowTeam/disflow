@@ -1,5 +1,0 @@
-{
-    "name": "@disflow-team/eslint-config",
-    "description": "ESLint config for Disflow",
-    "type": "module"
-}
