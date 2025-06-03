@@ -1,4 +1,4 @@
-import { type GenerationContext, BaseControlFlowNode, type BaseNode } from "@disflow-team/code-gen";
+import { type GenerationContext, BaseControlFlowNode, type BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
 
 export class IfNode extends BaseControlFlowNode {
     static title: string = "if";
@@ -6,8 +6,8 @@ export class IfNode extends BaseControlFlowNode {
 
     protected builder(): void {
         this.setName("if");
-        this.addInput("condition", "boolean");
-        this.addOutput("then", "*");
+        this.addInput("condition", FlowIOTypes.Boolean);
+        this.addOutput("then", FlowIOTypes.Any);
     }
 
     onGenerateCode(ctx: GenerationContext, visited: Set<BaseNode>): string {

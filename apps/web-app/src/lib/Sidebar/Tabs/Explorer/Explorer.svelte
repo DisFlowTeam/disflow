@@ -3,7 +3,8 @@
     import BaseTab from "../BaseTab.svelte";
     import File from "./File.svelte";
     import { getGraph } from "@disflow-team/utils";
-  import { generateCode } from "@disflow-team/code-gen";
+    import { generateCode } from "@disflow-team/code-gen";
+    import { ClientNode } from "../../../Nodes";
     let commands = $state<{ name: string, content: string }[]>()
     let projectSettings = $state<{ name: string }>()
 
@@ -31,7 +32,18 @@
         <button onclick={() => {
             const graph = getGraph();
 
-            const code = generateCode(graph);
+            const code = generateCode(graph, {
+                onAfterContextCreate(ctx) {
+                    /**
+                     * Create an exception for the node ClientNode
+                     * This will tell the program to assign `client` to whichever calls `.getVarNameByNode()` on `ClientNode`
+                    */
+                    ctx.registerException(ClientNode, "client");
+                },
+                filter(v) {
+                    return !(v instanceof ClientNode);
+                }
+            });
 
             console.log(code);
         }}>Test Code Gen</button>

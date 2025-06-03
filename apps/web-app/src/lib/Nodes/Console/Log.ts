@@ -1,4 +1,4 @@
-import { type GenerationContext, BaseNode, FlowMode } from "@disflow-team/code-gen";
+import { type GenerationContext, BaseNode, FlowIOTypes, FlowMode } from "@disflow-team/code-gen";
 
 export class LogNode extends BaseNode {
     static category: string = "Console";
@@ -7,7 +7,7 @@ export class LogNode extends BaseNode {
     builder(): void {
         this.includeFlow = FlowMode.Dynamic;
         this.setName("Log");
-        this.addInput("input", "*");
+        this.addInput("input", FlowIOTypes.Any);
     }
 
     onGenerateCode(ctx: GenerationContext): string {

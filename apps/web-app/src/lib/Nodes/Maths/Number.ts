@@ -1,4 +1,4 @@
-import { BaseNode, type GenerationContext } from "@disflow-team/code-gen";
+import { BaseNode, FlowIOTypes, type GenerationContext } from "@disflow-team/code-gen";
 
 export class NumberNode extends BaseNode {
     static category: string = "Maths";
@@ -6,7 +6,7 @@ export class NumberNode extends BaseNode {
 
     builder(): void {
         this.setName("Number");
-        this.addOutput("value", "number");
+        this.addOutput("value", FlowIOTypes.Number);
         this.properties = {
             value: 0
         };

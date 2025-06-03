@@ -1,4 +1,4 @@
-import { BaseNode, FlowMode, type GenerationContext } from "@disflow-team/code-gen";
+import { BaseNode, FlowIOTypes, FlowMode, type GenerationContext } from "@disflow-team/code-gen";
 
 export class EqualNode extends BaseNode {
     static title: string = "equal";
@@ -7,9 +7,9 @@ export class EqualNode extends BaseNode {
     builder(): void {
         this.includeFlow = FlowMode.Dynamic
         this.setName("equal");
-        this.addInput("first", "*");
-        this.addInput("second", "*");
-        this.addOutput("output", "boolean");
+        this.addInput("first", FlowIOTypes.Any);
+        this.addInput("second", FlowIOTypes.Any);
+        this.addOutput("output", FlowIOTypes.Boolean);
     }
 
     onGenerateCode(ctx: GenerationContext): string {

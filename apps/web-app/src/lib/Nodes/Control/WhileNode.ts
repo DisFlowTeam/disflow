@@ -1,4 +1,4 @@
-import { BaseControlFlowNode, BaseNode, FlowMode, GenerationContext } from "@disflow-team/code-gen";
+import { BaseControlFlowNode, BaseNode, FlowIOTypes, FlowMode, GenerationContext } from "@disflow-team/code-gen";
 
 export class WhileNode extends BaseControlFlowNode {
     static title: string = "While";
@@ -11,11 +11,11 @@ export class WhileNode extends BaseControlFlowNode {
     protected builder(): void {
         this.includeFlow = FlowMode.Off;
         this.setName("While");
-        this.addInput("condition", "boolean");
-        this.addOutput("Run", "*");
+        this.addInput("condition", FlowIOTypes.Boolean);
+        this.addOutput("Run", FlowIOTypes.Any);
         this.addWidget("toggle", "Incldue After", this.properties.isIncludeAfter, (v: boolean) => {
             this.properties.isIncludeAfter = v;
-            if(v) return this.addOutput("After", "*");
+            if(v) return this.addOutput("After", FlowIOTypes.Any);
             this.removeOutput(this.outputs.length - 1);
         });
     }

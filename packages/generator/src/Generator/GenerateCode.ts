@@ -35,10 +35,17 @@ function sortTopologically(graph: LGraph) {
     return sorted;
 }
 
-export function generateCode(graph: LGraph) {
-    const sorted = sortTopologically(graph);
+export interface CodeGenerationOptions {
+    filter?: (v: BaseNode) => boolean;
+    onAfterContextCreate?: (v: GenerationContext) => unknown;
+}
+
+export function generateCode(graph: LGraph, opts?: CodeGenerationOptions) {
+    let sorted = sortTopologically(graph);
+    if(opts?.filter && typeof opts.filter === "function") sorted = sorted.filter(opts.filter);
     const visited = new Set<BaseNode>();
     const context = new GenerationContext();
+    if(opts?.onAfterContextCreate && typeof opts.onAfterContextCreate === "function") opts.onAfterContextCreate(context);
     const code: { i: number; c: string }[] = [];
 
     sorted.forEach((node, i) => {
