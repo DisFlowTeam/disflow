@@ -9,10 +9,14 @@
     "devDependencies": {
         "@disflow-team/tsconfig": "workspace:^",
         "litegraph.js": "^0.7.18",
-        "tsup": "^8.5.0"
+        "tsup": "^8.5.0",
+        "typescript": "^5.8.3"
     },
     "scripts": {
-        "build": "tsup --config ./tsup.config.ts"
+        "build": "tsup --config ./tsup.config.ts",
+        "lint": "eslint src --ext .ts --fix",
+        "prettier": "prettier --write .",
+        "prettier:check": "prettier --check ."
     },
     "exports": {
         ".": {

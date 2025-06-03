@@ -1,21 +1,33 @@
 {
-  "name": "disflow",
-  "packageManager": "yarn@4.9.1",
-  "author": {
-    "name": "DisFlow Team"
-  },
-  "scripts": {
-    "build": "turbo build",
-    "test": "turbo test",
-    "dev": "turbo build --filter=!web-app && yarn workspace web-app dev",
-    "build:packages": "turbo build --filter=!web-app"
-  },
-  "devDependencies": {
-    "tsup": "^8.5.0",
-    "turbo": "^2.5.3"
-  },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+    "name": "disflow",
+    "packageManager": "yarn@4.9.1",
+    "author": {
+        "name": "DisFlow Team"
+    },
+    "scripts": {
+        "build": "turbo build",
+        "test": "turbo test",
+        "lint": "turbo run lint --filter=!web-app",
+        "dev": "turbo build --filter=!web-app && yarn workspace web-app dev",
+        "prettier": "turbo run prettier",
+        "prettier:check": "turbo run prettier:check",
+        "build:packages": "turbo build --filter=!web-app"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.28.0",
+        "eslint": "^9.28.0",
+        "prettier": "^3.5.3",
+        "tsup": "^8.5.0",
+        "turbo": "^2.5.3",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.33.0"
+    },
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "type": "module",
+    "dependencies": {
+        "@types/node": "^22.15.29"
+    }
 }
