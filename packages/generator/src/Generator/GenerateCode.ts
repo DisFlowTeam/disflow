@@ -1,7 +1,7 @@
 import type { LGraph } from "litegraph.js";
-// this is wacky ngl ...
-import type { BaseNode } from "../../../nodes/src/nodes/BaseNode";
+import type { BaseNode } from "../nodes";
 import { GenerationContext } from "./GenerationContext";
+import { BaseControlFlowNode } from "../nodes/Base/BaseControlFlowNode";
 
 function sortTopologically(graph: LGraph) {
     const visited = new Set<BaseNode>();
@@ -36,15 +36,25 @@ function sortTopologically(graph: LGraph) {
 }
 
 export function generateCode(graph: LGraph) {
-    const sorted = sortTopologically(graph)
+    const sorted = sortTopologically(graph);
+    const visited = new Set<BaseNode>();
     const context = new GenerationContext();
-    let code = "";
+    let code: { i: number, c: string }[] = [];
 
-    sorted.forEach((node) => {
-        // @ts-expect-error
-        const c = node.onGenerateCode(context);
-        code += `${c}\n`;
+    sorted.forEach((node, i) => {
+        if(visited.has(node)) return;
+        if(!(node instanceof BaseControlFlowNode)) return;
+
+        code.push({ i, c: node.onGenerateCode(context, visited) })
+        
+        visited.add(node);
     })
 
-    return code.trim();
+    sorted.forEach((node, i) => {
+        if(visited.has(node)) return;
+        const c = node.onGenerateCode(context, visited);
+        code.push({ i, c });
+    })
+
+    return code.sort((a, b) => a.i - b.i).map(v => v.c).join("\n").trim();
 }

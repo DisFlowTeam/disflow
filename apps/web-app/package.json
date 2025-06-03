@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@disflow-team/code-gen": "workspace:^",
-    "@disflow-team/nodes": "workspace:^",
     "@disflow-team/utils": "workspace:^",
     "litegraph.js": "^0.7.18"
   }
