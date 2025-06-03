@@ -5,10 +5,10 @@ export class GenerationContext {
     usedNames = new Set<string>();
 
     requestUniqueName(node: BaseNode) {
-        if(this.nameMap.has(node)) return this.nameMap.get(node)!;
+        if (this.nameMap.has(node)) return this.nameMap.get(node)!;
         let count = 0;
-        const title = node.title.toLowerCase()
-        while(this.usedNames.has(`${title}_${count}`)) {
+        const title = node.title.toLowerCase();
+        while (this.usedNames.has(`${title}_${count}`)) {
             count++;
         }
         const variableName = `${title}_${count}`;

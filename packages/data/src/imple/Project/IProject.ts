@@ -1,6 +1,6 @@
 export interface JsonProject extends JsonPreviewProject {
     main: string;
-    commands: { name: string, content: string }[];
+    commands: { name: string; content: string }[];
 }
 
 export interface JsonPreviewProject {
@@ -30,13 +30,13 @@ export abstract class IPreviewProject {
             likes: this.likes,
             name: this.name,
             files: this.files,
-            pid: this.pid
-        }
+            pid: this.pid,
+        };
     }
 }
 
 export abstract class IProject extends IPreviewProject {
-    abstract fetchCommand(name: string): { name: string, content: string } | undefined;
+    abstract fetchCommand(name: string): { name: string; content: string } | undefined;
 
     async fetchProject(): Promise<IProject | undefined> {
         return this;

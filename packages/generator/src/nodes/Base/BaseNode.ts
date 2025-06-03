@@ -1,31 +1,33 @@
 import { INodeInputSlot, type INodeOutputSlot, LGraphNode } from "litegraph.js";
 import type { GenerationContext } from "../../Generator";
-import { getGraph } from "@disflow-team/utils"
+import { getGraph } from "@disflow-team/utils";
 
 export enum FlowMode {
     Off,
     On,
-    Dynamic
+    Dynamic,
 }
 
 declare module "litegraph.js" {
     interface LGraphNode {
+        /* eslint-disable-next-line */
         onOutputAdded: (output: INodeOutputSlot) => any;
+        /* eslint-disable-next-line */
         onInputAdded: (input: INodeInputSlot) => any;
     }
 }
 
 export abstract class BaseNode extends LGraphNode {
     includeFlow: FlowMode = FlowMode.On;
-    private inputHandler: undefined | LGraphNode['onInputAdded'];
-    private outputHandler: undefined | LGraphNode['onOutputAdded'];
+    private inputHandler: undefined | LGraphNode["onInputAdded"];
+    private outputHandler: undefined | LGraphNode["onOutputAdded"];
 
     constructor() {
         super();
         this.builder();
         if (this.includeFlow === FlowMode.On || this.includeFlow === FlowMode.Dynamic) {
-            const flowOut = this.outputs.findIndex(v => v.name === "flow out");
-            const flowIn = this.inputs.findIndex(v => v.name === "flow in");
+            const flowOut = this.outputs.findIndex((v) => v.name === "flow out");
+            const flowIn = this.inputs.findIndex((v) => v.name === "flow in");
             if (flowIn === -1) this.addInput("flow in", "flow");
             if (flowOut === -1) this.addOutput("flow out", "flow");
 
@@ -37,17 +39,17 @@ export abstract class BaseNode extends LGraphNode {
                 this.addWidget("toggle", "Toggle Flow", true, (v: boolean) => {
                     this.properties.__flowState = v;
                     if (!v) {
-                        const flowOut = this.outputs.findIndex(v => v.name === "flow out");
-                        const flowIn = this.inputs.findIndex(v => v.name === "flow in");
+                        const flowOut = this.outputs.findIndex((v) => v.name === "flow out");
+                        const flowIn = this.inputs.findIndex((v) => v.name === "flow in");
 
-                        if(!this.graph) this.graph = getGraph();
-                        if (flowOut !== -1) this.removeOutput(flowOut)
-                        if (flowIn !== -1) this.removeInput(flowIn)
+                        if (!this.graph) this.graph = getGraph();
+                        if (flowOut !== -1) this.removeOutput(flowOut);
+                        if (flowIn !== -1) this.removeInput(flowIn);
                     } else {
                         this.addInput("flow in", "flow");
                         this.addOutput("flow out", "flow");
                     }
-                })
+                });
             }
         }
         this.serialize_widgets = true;
@@ -62,14 +64,14 @@ export abstract class BaseNode extends LGraphNode {
     }
 
     static buildName() {
-        return `${this.category}/${this.title}`
+        return `${this.category}/${this.title}`;
     }
 
-    protected setInputAddedHandler(cb: LGraphNode['onInputAdded']) {
+    protected setInputAddedHandler(cb: LGraphNode["onInputAdded"]) {
         this.inputHandler = cb;
     }
 
-    protected setOutputAddedHandler(cb: LGraphNode['onOutputAdded']) {
+    protected setOutputAddedHandler(cb: LGraphNode["onOutputAdded"]) {
         this.outputHandler = cb;
     }
 
@@ -80,10 +82,15 @@ export abstract class BaseNode extends LGraphNode {
         }
 
         if (output.name === "flow out" && output.type === "flow") return;
-        if (this.includeFlow === FlowMode.On || (this.includeFlow === FlowMode.Dynamic && this.properties.__flowState)) {
-            const flowOut = this.outputs.findIndex(v => v.name === "flow out" && v.type === "flow");
+        if (
+            this.includeFlow === FlowMode.On ||
+            (this.includeFlow === FlowMode.Dynamic && this.properties.__flowState)
+        ) {
+            const flowOut = this.outputs.findIndex(
+                (v) => v.name === "flow out" && v.type === "flow"
+            );
             if (flowOut !== -1) {
-                if(!this.graph) this.graph = getGraph();
+                if (!this.graph) this.graph = getGraph();
                 this.removeOutput(flowOut);
             }
             this.addOutput("flow out", "flow");
@@ -98,16 +105,19 @@ export abstract class BaseNode extends LGraphNode {
         }
 
         if (input.name === "flow in" && input.type === "flow") return;
-        if (this.includeFlow === FlowMode.On || (this.includeFlow === FlowMode.Dynamic && this.properties.__flowState)) {
-            const flowIn = this.inputs.findIndex(v => v.name === "flow in");
+        if (
+            this.includeFlow === FlowMode.On ||
+            (this.includeFlow === FlowMode.Dynamic && this.properties.__flowState)
+        ) {
+            const flowIn = this.inputs.findIndex((v) => v.name === "flow in");
             if (flowIn !== -1) {
-                if(!this.graph) this.graph = getGraph();
+                if (!this.graph) this.graph = getGraph();
                 this.removeInput(flowIn);
             }
             this.addInput("flow in", "flow");
             if (this.inputHandler) this.inputHandler(input);
         }
-    }
+    };
 
     /**
      * Called when the node is constructed

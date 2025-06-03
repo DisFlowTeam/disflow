@@ -7,7 +7,7 @@ export abstract class BaseControlFlowNode extends BaseNode {
         const outputNodes = this.getOutputNodes(slot) as BaseNode[];
         const branches = new Set<BaseNode>();
 
-        for(const node of outputNodes) {
+        for (const node of outputNodes) {
             this.collectBranchNodes(node, branches, visited);
         }
 
@@ -19,24 +19,27 @@ export abstract class BaseControlFlowNode extends BaseNode {
 
         let code = "";
 
-        for(const child of allChildNodes) {
+        for (const child of allChildNodes) {
             code += child.onGenerateCode(ctx, visited);
         }
 
-        return code.split("\n").map(v => `\t${v}`).join("\n");
+        return code
+            .split("\n")
+            .map((v) => `\t${v}`)
+            .join("\n");
     }
 
     private collectBranchNodes(node: BaseNode, branches: Set<BaseNode>, visited: Set<BaseNode>) {
-        if(visited.has(node)) return;
-        if(branches.has(node)) return;
+        if (visited.has(node)) return;
+        if (branches.has(node)) return;
 
         branches.add(node);
         visited.add(node);
 
-        for(let i = 0; i < node.outputs.length; i++) {
+        for (let i = 0; i < node.outputs.length; i++) {
             const outNodes = node.getOutputNodes(i);
-            if(!outNodes) continue;
-            for(const node of outNodes as BaseNode[]) {
+            if (!outNodes) continue;
+            for (const node of outNodes as BaseNode[]) {
                 this.collectBranchNodes(node, branches, visited);
             }
         }

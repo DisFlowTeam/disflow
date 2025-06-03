@@ -6,7 +6,7 @@ let graph: LGraph | undefined = undefined;
 let canvas: LGraphCanvas | undefined = undefined;
 
 export function getGraph(o?: object) {
-    if(!graph) graph = new LGraph(o);
+    if (!graph) graph = new LGraph(o);
     return graph;
 }
 
@@ -16,7 +16,7 @@ export function constructCanvas(...args: ConstructorParameters<typeof LGraphCanv
 }
 
 export function getCanvas() {
-    if(!canvas) throw new Error("Canvas not yet initialized. Call `constructCanvas` first");
+    if (!canvas) throw new Error("Canvas not yet initialized. Call `constructCanvas` first");
     return canvas;
 }
 
