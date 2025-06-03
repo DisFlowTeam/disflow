@@ -8,7 +8,8 @@ export default tseslint.config({
         ...tseslint.configs.recommended
     ],
     rules: {
-        "@typescript-eslint/no-unsafe-call": "warn"
+        "@typescript-eslint/no-unsafe-call": "warn",
+        "semi": "warn"
     },
     languageOptions: {
         parserOptions: {

@@ -1,3 +1,3 @@
-import { defineConfig } from "../../tsup.config"
+import { defineConfig } from "../../tsup.config";
 
-export default defineConfig({})
+export default defineConfig({});
