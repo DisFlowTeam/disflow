@@ -1,2 +1,3 @@
-# disflow
-A MonoRepo containing the nodes, code generator and utils for DisFlow.
+<div align="center">
+  <a href="images/DISFLOW.png" alt="disflow logo" />
+</div>
