@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+    --color-blurple-900: #131823;
+    --color-plurple-950: #10151f;
+}
+
+@layer {
+    .landing-flows {
+        @apply w-52 h-32 rounded-xl
+    }
+    .scale-container {
+        @apply lg:w-[70%] lg:left-[15%] h-[70%] md:w-[70%] md:left-[15%] lg:top-[15%] md:top-[15%] w-full left-0 z-20
+    }
+}
+
+.custom-shadow-blue {
+    box-shadow: 0 0 30px oklch(70.7% 0.165 254.624);
+}
+
+.custom-shadow-yellow {
+    box-shadow: 0 0 30px yellow;
+}

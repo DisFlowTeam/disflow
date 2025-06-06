@@ -7,11 +7,11 @@
     "scripts": {
         "build": "turbo build",
         "test": "turbo test",
-        "lint": "turbo run lint --filter=!web-app",
-        "dev": "turbo build --filter=!web-app && yarn workspace web-app dev",
+        "lint": "turbo run lint",
+        "dev": "turbo build --filter=!web-application && yarn workspace web-application dev",
         "prettier": "turbo run prettier",
         "prettier:check": "turbo run prettier:check",
-        "build:packages": "turbo build --filter=!web-app"
+        "build:packages": "turbo build --filter=!web-application"
     },
     "devDependencies": {
         "@eslint/js": "^9.28.0",
