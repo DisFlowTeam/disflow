@@ -35,6 +35,7 @@
 		"@disflow-team/code-gen": "workspace:^",
 		"@disflow-team/utils": "workspace:^",
 		"@tailwindcss/vite": "^4.1.8",
+		"litegraph.js": "^0.7.18",
 		"tailwindcss": "^4.1.8"
 	}
 }
