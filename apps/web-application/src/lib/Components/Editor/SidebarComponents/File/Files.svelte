@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import File from "./File.svelte";
-
     let commands: { name: string, file: string }[] = $state([]);
-    let projectName: string = $state("");
+    let projectName: string = $state("Unnamed project");
     
     onMount(() => {
         // if(location.pathname === "/demo") {
@@ -17,9 +16,9 @@
 </script>
 
 <div class="pl-2 text-white pt-2">
-    Project: {projectName}
+    {projectName}
 </div>
 <File name="main" />
 {#each commands as command}
-    <File name={command.name} />
+<File name={command.name} />
 {/each}

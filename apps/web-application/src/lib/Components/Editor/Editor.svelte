@@ -4,6 +4,7 @@
 	import 'litegraph.js/css/litegraph.css';
 	import { LiteGraph } from 'litegraph.js';
 	import * as Nodes from '$lib/Nodes';
+	import Sidebar from './Sidebar.svelte';
 	import Files from './SidebarComponents/File/Files.svelte';
 	import { changeFile, currentFile } from './SidebarComponents/File/Switch';
 
@@ -67,15 +68,21 @@
 </script>
 
 <div class="flex h-[calc(100vh-5rem)] w-screen border-gray-500 border-t-[1px]">
+	{#if currentSidebar}
 	<div class="w-[20%] h-full flex">
-		<div class="w-[20%] h-full bg-slate-900 border-r-[1px] border-gray-500"></div>
-		<div class="w-[80%] h-full bg-slate-900 border-r-[1px] border-gray-500">
+		<Sidebar />
+		<div class="w-full h-full bg-slate-900 border-r-[1px] border-gray-500">
 			{#if currentSidebar === "files"}
 				<Files />
+			{:else}
+				<div class="flex items-center justify-center h-full text-gray-500">
+					<p class="text-lg">No content for {currentSidebar} tab yet.</p>
+				</div>
 			{/if}
 		</div>
 	</div>
-	<div class="w-[80%] h-full">
+	{/if}
+	<div class="w-full h-full">
 		<div class="h-[5%] bg-slate-900 border-b-[1px] border-gray-500"></div>
 		<canvas bind:this={canvas} class="h-[95%] w-full"></canvas>
 	</div>

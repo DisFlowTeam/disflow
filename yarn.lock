@@ -3402,6 +3402,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"svelte-icons@npm:2.1.0":
+  version: 2.1.0
+  resolution: "svelte-icons@npm:2.1.0"
+  checksum: 10c0/1150b9f67302e3b3b2b7d403d5695a5e11d3f77a10393516b719ce3b306e9a300a0fc02be9ff328a2488723feccdad7709329a97c7d43d55605ab00566a482f2
+  languageName: node
+  linkType: hard
+
 "svelte@npm:^5.0.0":
   version: 5.33.14
   resolution: "svelte@npm:5.33.14"
@@ -3850,6 +3857,7 @@ __metadata:
     prettier-plugin-svelte: "npm:^3.3.3"
     svelte: "npm:^5.0.0"
     svelte-check: "npm:^4.0.0"
+    svelte-icons: "npm:2.1.0"
     tailwindcss: "npm:^4.1.8"
     typescript: "npm:^5.0.0"
     typescript-eslint: "npm:^8.20.0"
