@@ -26,17 +26,17 @@ export class Compare extends BaseNode {
 
         this.addWidget('combo', "Operator", "=", (value) => {
             if (["AND", "OR"].includes(value)) {
+                this.inputs[0].type = FlowIOTypes.Boolean;
                 this.inputs[1].type = FlowIOTypes.Boolean;
-                this.inputs[2].type = FlowIOTypes.Boolean;
             } else if (["<", ">", "≥", "≤"].includes(value)) {
+                this.inputs[0].type = FlowIOTypes.Number;
                 this.inputs[1].type = FlowIOTypes.Number;
-                this.inputs[2].type = FlowIOTypes.Number;
             } else {
+                this.inputs[0].type = FlowIOTypes.Any;
                 this.inputs[1].type = FlowIOTypes.Any;
-                this.inputs[2].type = FlowIOTypes.Any;
             }
 
-            const inputs = [this.inputs[1], this.inputs[2]];
+            const inputs = [this.inputs[0], this.inputs[1]];
 
             if (this.graph) {
                 for (let i = 0; i < inputs.length; i++) {
@@ -47,8 +47,8 @@ export class Compare extends BaseNode {
                     if (!origin) continue;
                     const originSlot = linkData.origin_slot;
 
-                    this.disconnectInput(i + 1);
-                    origin.connect(originSlot, this, i + 1);
+                    this.disconnectInput(i);
+                    origin.connect(originSlot, this, i);
                 }
             }
 

@@ -1,23 +1,25 @@
 import { BaseNode, FlowIOTypes, BaseGenerator } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
+import { LiteGraph } from "litegraph.js";
 
-export class TextLength extends BaseNode {
-    static title: string = "Text Length";
+export class ReverseText extends BaseNode {
+
+    static title: string = "Reverse Text";
     static category: string = "Text Tools";
     static noFlows: boolean = true;
 
+
     protected onBuild(): void {
         this.setNodeColor(NodeCategoryColor.TextTools);
-
         this.addInput("Text", FlowIOTypes.Any);
+        this.addOutput("Text", FlowIOTypes.String);
+
         this.addProperty("txt", "Your Text", FlowIOTypes.String);
-        this.addWidget("text", "Text", "Your Text", (v: string) => {
+        this.addWidget("text", "In Text", "Your Text", (v: string) => {
             this.properties.txt = v;
         }, {
             property: "txt"
         })
-
-        this.addOutput("Number", FlowIOTypes.Number);
     }
 
     nodeToCode(generator: BaseGenerator): string {
@@ -31,7 +33,8 @@ export class TextLength extends BaseNode {
                     ? JSON.stringify(this.properties.txt)
                     : `String(${generator.valueToCode(this, 0)})`;
         }
-
-        return `${txt}.length()`;
+    
+        return `${txt}.split('').reverse().join('')`;
     }
+    
 }

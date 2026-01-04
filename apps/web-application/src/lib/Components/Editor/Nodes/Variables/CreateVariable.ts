@@ -34,18 +34,19 @@ export class CreateVariable extends BaseNode {
 
     nodeToCode(generator: BaseGenerator): string {
         const keyword = controls[this.properties.keyword as keyof typeof controls];
+        const name = this.properties.name || "myVariable";
         const valueInput = this.inputs[1];
         const hasValue = valueInput?.link != null;
     
         if (keyword === "const" && !hasValue) {
-            return `const ${this.properties.name} = undefined;`;
+            return `const ${name} = undefined;`;
         }
     
         if (hasValue) {
-            return `${keyword} ${this.properties.name} = ${generator.valueToCode(this, 1)};`;
+            return `${keyword} ${name} = ${generator.valueToCode(this, 1)};`;
         }
     
-        return `${keyword} ${this.properties.name};`;
+        return `${keyword} ${name};`;
     }
     
 }

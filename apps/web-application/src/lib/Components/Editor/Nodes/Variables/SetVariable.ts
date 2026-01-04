@@ -17,6 +17,7 @@ export class SetVariable extends BaseNode {
     }
 
     nodeToCode(generator: BaseGenerator): string {
-        return `${this.properties.name} = ${generator.valueToCode(this, 0)};`;
+        const value = this.inputs[1].link == null ? `undefined` : generator.valueToCode(this, 1);
+        return `${this.properties.name} = ${value};`;
     }
 }
