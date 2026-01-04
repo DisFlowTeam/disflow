@@ -12,6 +12,6 @@ export class NewLine extends BaseNode {
     }
 
     nodeToCode(): string {
-        return `\n`;
+        return `"\\n"`;
     }
 }

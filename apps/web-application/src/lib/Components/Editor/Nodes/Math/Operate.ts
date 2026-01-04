@@ -1,4 +1,3 @@
-// NEEDS FIXING
 import { BaseGenerator, BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
 
@@ -46,14 +45,14 @@ export class Operate extends BaseNode {
 
     nodeToCode(generator: BaseGenerator): string {
         const A =
-            this.properties.A !== ""
+            this.inputs[0].link == null
                 ? this.properties.A
-                : `${generator.valueToCode(this, 0)}`;
-
+                : generator.valueToCode(this, 0);
+        
         const B =
-            this.properties.A !== ""
-                ? this.properties.A
-                : `${generator.valueToCode(this, 1)}`;
+            this.inputs[1].link == null
+                ? this.properties.B
+                : generator.valueToCode(this, 1);
         
         return `(${A} ${controls[this.properties.type as keyof typeof controls]} ${B})`
     }

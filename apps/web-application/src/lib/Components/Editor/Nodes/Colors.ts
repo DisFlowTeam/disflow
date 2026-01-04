@@ -10,7 +10,6 @@ LiteGraph.LINK_COLOR = "#CFCFCF";
 
 export enum NodeCategoryColor {
     Events = "#C83A3A",
-    Comparison = "#B8961E",
     Variables = "#8E5ACF",
     Control = "#3F7FCC",
     Console = "#2FA59A",

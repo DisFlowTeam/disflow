@@ -41,22 +41,36 @@ export class ReplaceText extends BaseNode {
     }
 
     nodeToCode(generator: BaseGenerator): string {
-        const inText =
-            this.properties.intext.trim() !== ""
-                ? JSON.stringify(this.properties.intext)
-                : `String(${generator.valueToCode(this, 0)})`;
+        let inText, replace, withText;
+
+        if ((this.inputs[0].link != null) && (this.getInputDataType(0) == FlowIOTypes.String)) {
+            inText = generator.valueToCode(this, 0);
+        } else {
+            inText =
+                this.inputs[0].link == null
+                    ? JSON.stringify(this.properties.intext)
+                    : `String(${generator.valueToCode(this, 0)})`;
+        }
+
+        if ((this.inputs[1].link != null) && (this.getInputDataType(1) == FlowIOTypes.String)) {
+            replace = generator.valueToCode(this, 1);
+        } else {
+            replace =
+                this.inputs[1].link == null
+                    ? JSON.stringify(this.properties.replace)
+                    : `String(${generator.valueToCode(this, 1)})`;
+        }
+
+        if ((this.inputs[2].link != null) && (this.getInputDataType(2) == FlowIOTypes.String)) {
+            withText = generator.valueToCode(this, 2);
+        } else {
+            withText =
+                this.inputs[2].link == null
+                    ? JSON.stringify(this.properties.with)
+                    : `String(${generator.valueToCode(this, 2)})`;
+        }
     
-        const replace =
-            this.properties.replace.trim() !== ""
-                ? JSON.stringify(this.properties.replace)
-                : `String(${generator.valueToCode(this, 1)})`;
-    
-        const withText =
-            this.properties.with.trim() !== ""
-                ? JSON.stringify(this.properties.with)
-                : `String(${generator.valueToCode(this, 2)})`;
-    
-        return `${inText}.replaceAll(${replace}, ${withText});`;
+        return `${inText}.replaceAll(${replace}, ${withText})`;
     }
     
 }

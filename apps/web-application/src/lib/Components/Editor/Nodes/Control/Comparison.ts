@@ -14,11 +14,11 @@ const controls = {
 
 export class Compare extends BaseNode {
     static title: string = "Comparison";
-    static category: string = "Comparison";
+    static category: string = "Control";
     static noFlows: boolean = true;
 
     protected onBuild(): void {
-        this.setNodeColor(NodeCategoryColor.Comparison);
+        this.setNodeColor(NodeCategoryColor.Control);
         this.addInput("A", FlowIOTypes.Any);
         this.addInput("B", FlowIOTypes.Any);
 
@@ -58,7 +58,7 @@ export class Compare extends BaseNode {
             property: "operator"
         })
 
-        this.addOutput("Number", FlowIOTypes.Boolean);
+        this.addOutput("Boolean", FlowIOTypes.Boolean);
     }
 
     nodeToCode(generator: BaseGenerator): string {

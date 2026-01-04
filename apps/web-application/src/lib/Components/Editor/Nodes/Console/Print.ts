@@ -1,8 +1,9 @@
 import { BaseGenerator, BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
+import type { LLink, INodeOutputSlot, INodeInputSlot } from "litegraph.js";
 
-export class Log extends BaseNode {
-    static title: string = "Log";
+export class Print extends BaseNode {
+    static title: string = "Print";
     static category: string = "Console";
 
     protected onBuild(): void {
@@ -21,8 +22,8 @@ export class Log extends BaseNode {
     }
 
     nodeToCode(generator: BaseGenerator): string {
-        const logValue = this.properties.content.trim() === "" ? generator.valueToCode(this, 1) : `"${this.properties.content.trim()}"`;
+        const printValue = this.inputs[1].link == null ? JSON.stringify(this.properties.content) : generator.valueToCode(this, 1);
 
-        return `console.log(${logValue});`;
+        return `console.log(${printValue});`;
     }
 }

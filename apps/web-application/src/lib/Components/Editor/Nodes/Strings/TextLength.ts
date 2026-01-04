@@ -21,10 +21,17 @@ export class TextLength extends BaseNode {
     }
 
     nodeToCode(generator: BaseGenerator): string {
-        const text =
-            this.properties.txt.trim() !== ""
-                ? JSON.stringify(this.properties.txt)
-                : `String(${generator.valueToCode(this, 0)})`;
-        return `${text}.length()`;
+        let txt;
+
+        if ((this.inputs[0].link != null) && (this.getInputDataType(0) == FlowIOTypes.String)) {
+            txt = generator.valueToCode(this, 0);
+        } else {
+            txt =
+                this.inputs[0].link == null
+                    ? JSON.stringify(this.properties.txt)
+                    : `String(${generator.valueToCode(this, 0)})`;
+        }
+
+        return `${txt}.length()`;
     }
 }

@@ -1,5 +1,6 @@
 import { BaseNode, FlowIOTypes, BaseGenerator } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
+import type { LLink, INodeInputSlot, INodeOutputSlot } from "litegraph.js";
 
 export class CreateText extends BaseNode {
 
@@ -29,15 +30,25 @@ export class CreateText extends BaseNode {
     }
 
     nodeToCode(generator: BaseGenerator): string {
-        const A =
-            this.properties.A.trim() !== ""
-                ? JSON.stringify(this.properties.A)
-                : `String(${generator.valueToCode(this, 0)})`;
+        let A, B;
 
-        const B =
-            this.properties.A.trim() !== ""
-                ? JSON.stringify(this.properties.A)
-                : `String(${generator.valueToCode(this, 1)})`;
+        if ((this.inputs[0].link != null) && (this.getInputDataType(0) == FlowIOTypes.String)) {
+            A = generator.valueToCode(this, 0);
+        } else {
+            A =
+                this.inputs[0].link == null
+                    ? JSON.stringify(this.properties.A)
+                    : `String(${generator.valueToCode(this, 0)})`;
+        }
+
+        if ((this.inputs[1].link != null) && (this.getInputDataType(1) == FlowIOTypes.String)) {
+            B = generator.valueToCode(this, 1);
+        } else {
+            B =
+                this.inputs[1].link == null
+                    ? JSON.stringify(this.properties.B)
+                    : `String(${generator.valueToCode(this, 1)})`;
+        }
         
         return `(${A} + ${B})`
     }
