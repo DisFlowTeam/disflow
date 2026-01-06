@@ -1,28 +1,29 @@
 import { FlowIOTypes } from "@disflow-team/code-gen";
+import { LiteGraph } from "litegraph.js";
+
+LiteGraph.NODE_TEXT_COLOR = "#FFFFFF";
+LiteGraph.NODE_TITLE_COLOR = "#FFFFFF";
+LiteGraph.NODE_DEFAULT_BOXCOLOR = "#0E0E0E";
+LiteGraph.NODE_DEFAULT_BGCOLOR = "#1A1A1A";
+LiteGraph.EVENT_LINK_COLOR = "#FFFFFF";
+LiteGraph.LINK_COLOR = "#CFCFCF";
 
 export enum NodeCategoryColor {
-    // Deep Crimson
-    Events = "#661111",
-    // Deep Navy
-    Logic = "#1A3A5A",
-    // Dark Forest
-    Math = "#1B331B",
-    // Burnt Orange
-    TextTools = "#734D00",
-    // Deep Indigo
-    Variables = "#331A4D",
-    // Obsidian
-    Actions = "#111111",
-    // Slate
-    Default = "#222222"
+    Events = "#C83A3A",
+    Variables = "#8E5ACF",
+    Control = "#3F7FCC",
+    Console = "#2FA59A",
+    Maths = "#2FBF73",
+    TextTools = "#C97A2B"
 }
 
 export enum FlowIOColor {
-    String = "#F1C40F",
-    Number = "#2ECC71",
-    Object = "#3498DB",
-    Array = "#9B59B6",
-    Any = "#95A5A6",
-    Boolean = "#E74C3C",
-    Flow = "#ECF0F1"       
-}
+    String = "#F29E4C",
+    Number = "#3DDC84",
+    Object = "#4C8DFF",
+    Array = "#A66BFF",
+    Any = "#9CA3AF",
+    Boolean = "#FF5C5C",
+    Flow = "#E5484D"
+  }
+  

@@ -10,6 +10,30 @@
 	import { FlowIOTypes } from '@disflow-team/code-gen';
 	import * as Nodes from './Nodes';
 	import { FlowIOColor } from './Nodes/Colors';
+	import { NodeCategoryColor } from './Nodes/Colors';
+
+	const originalAddItem = LiteGraph.ContextMenu.prototype.addItem;
+
+	LiteGraph.ContextMenu.prototype.addItem = function (name, value, options) {
+		const element = originalAddItem.call(
+			this,
+			name,
+			value,
+			options
+		) as HTMLDivElement | undefined;
+
+		if (element && element.classList.contains('has_submenu')) {
+			const key = name.replaceAll(" ", "");
+			if (key in NodeCategoryColor) {
+				
+				const color = NodeCategoryColor[key as keyof typeof NodeCategoryColor];
+    			element.style.borderRightColor = color;
+			}
+		}
+
+		return element;
+	};
+
 
 	let code = '';
 

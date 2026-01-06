@@ -82,7 +82,7 @@ export class JavaScriptGenerator extends BaseGenerator {
     }
 
     /**
-     * Walk down all the "exec" path
+     * Walk down all the "Exec" path
      * @param node The starting node
      */
     walkDownStream(node: BaseNode) {

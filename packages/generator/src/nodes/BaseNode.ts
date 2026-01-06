@@ -26,8 +26,8 @@ export abstract class BaseNode extends LGraphNode {
         const childNode = (this.constructor as typeof BaseNode);
 
         if (!childNode.noFlows) {
-            this.addInput("exec", FlowIOTypes.Flow);
-            this.addOutput("exec", FlowIOTypes.Flow);
+            this.addInput("Exec", FlowIOTypes.Flow);
+            this.addOutput("Exec", FlowIOTypes.Flow);
         }
 
         this.onBuild();

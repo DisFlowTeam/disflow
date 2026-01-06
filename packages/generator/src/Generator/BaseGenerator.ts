@@ -33,7 +33,7 @@ export abstract class BaseGenerator {
     }
 
     getExecOutputNode(node: BaseNode): BaseNode | null {
-        const outputData = node.outputs.findIndex((output) => output.name === "exec" && BaseGenerator.isExecutionPin(output.type));
+        const outputData = node.outputs.findIndex((output) => output.name === "Exec" && BaseGenerator.isExecutionPin(output.type));
         if (outputData === -1) return null;
         const outputNode = node.getOutputNodes(outputData) as BaseNode[] | null;
 

@@ -9,16 +9,15 @@ export class SetVariable extends BaseNode {
         this.setNodeColor(NodeCategoryColor.Variables);
         this.addProperty("name", "Name", FlowIOTypes.String);
         this.addWidget("text", "Name", "myVariable", (v: string) => {
-            if(v.trim() === "") this.addInput("name", FlowIOTypes.String);
-
             this.properties.name = v;
         }, {
             property: "name"
         })
-        this.addInput("value", FlowIOTypes.Any);
+        this.addInput("Value", FlowIOTypes.Any);
     }
 
     nodeToCode(generator: BaseGenerator): string {
-        return `${this.properties.name} = ${generator.valueToCode(this, 1)};`;
+        const value = this.inputs[1].link == null ? `undefined` : generator.valueToCode(this, 1);
+        return `${this.properties.name} = ${value};`;
     }
 }

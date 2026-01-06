@@ -39,6 +39,10 @@
         @apply bg-[#444444]!;
     }
 
+    .litemenu-entry.has_submenu {
+        @apply border-r-2!;
+    }
+
     /* The search box */
     .litesearchbox {
         @apply bg-[#444444]! rounded-sm! text-gray-200!

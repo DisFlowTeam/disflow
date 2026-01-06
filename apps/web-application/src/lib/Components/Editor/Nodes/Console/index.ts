@@ -1,1 +1,3 @@
-export * from "./Log";
+export * from "./Print";
+export * from "./ThrowError";
+export * from "./ClearConsole";
