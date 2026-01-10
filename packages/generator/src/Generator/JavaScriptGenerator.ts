@@ -2,12 +2,15 @@ import type { LGraph, INodeInputSlot } from "litegraph.js";
 import { BaseNode, ImportType, OnProgramStartNode, RootNode } from "../nodes";
 import { BaseGenerator, GenerationError, GenerationErrorType } from "./BaseGenerator";
 
-const IMPORT_STATEMENT = ["// ------------ START DISFLOW IMPORT STATEMENTS ------------", "// ------------ END DISFLOW IMPORT STATEMENTS ------------"]
+const IMPORT_STATEMENT = [
+    "// ------------ START DISFLOW IMPORT STATEMENTS ------------",
+    "// ------------ END DISFLOW IMPORT STATEMENTS ------------",
+];
 
 export enum JavaScriptConstantStrings {
     Null = "null",
     Undefined = "undefined",
-    NoOp = "// NO OPERATION"
+    NoOp = "// NO OPERATION",
 }
 
 export interface JavaScriptImport {
@@ -30,17 +33,25 @@ export class JavaScriptGenerator extends BaseGenerator {
         const iInfo = node.getInputInfo(inputIndex);
 
         if (!iInfo || BaseGenerator.isExecutionPin(iInfo.type) || !iNode) {
-            console.warn(`WARNING: Attemped to generate code for input ${inputIndex} of ${node.title} but input was not found or was a flow type.`);
+            console.warn(
+                `WARNING: Attemped to generate code for input ${inputIndex} of ${node.title} but input was not found or was a flow type.`
+            );
             return JavaScriptConstantStrings.Null;
         }
 
-        if (this.visitedNodes.has(iNode.id)) throw new GenerationError("The graph contains circular dependencies", GenerationErrorType.CircularDependency);
+        if (this.visitedNodes.has(iNode.id))
+            throw new GenerationError(
+                "The graph contains circular dependencies",
+                GenerationErrorType.CircularDependency
+            );
 
         if (this.codeCache.has(iNode.id)) return this.codeCache.get(iNode.id)!;
 
         try {
             if (!this.hasGenerator(iNode)) {
-                console.warn(`WARNING: Attemped to generate code for input ${inputIndex} of ${node.title} but input node was not registered with the JavaScript generator for code generation.`);
+                console.warn(
+                    `WARNING: Attemped to generate code for input ${inputIndex} of ${node.title} but input node was not registered with the JavaScript generator for code generation.`
+                );
                 return JavaScriptConstantStrings.Null;
             }
 
@@ -60,28 +71,39 @@ export class JavaScriptGenerator extends BaseGenerator {
             .map((input, i) => {
                 return {
                     input,
-                    node: node.getInputNode(i) as BaseNode | null
-                }
+                    node: node.getInputNode(i) as BaseNode | null,
+                };
             })
-            .filter(v => v.node && !BaseGenerator.isExecutionPin(v.input.type)) as { node: BaseNode, input: INodeInputSlot }[];
-
+            .filter((v) => v.node && !BaseGenerator.isExecutionPin(v.input.type)) as {
+                node: BaseNode;
+                input: INodeInputSlot;
+            }[];
     }
 
     // walk down the execution connections
     statementToCode(node: BaseNode, outputIndex: number): string {
         let finalCode = "";
-        const oNodes = node.getOutputNodes(outputIndex) as BaseNode[] | null || [];
+        const oNodes = (node.getOutputNodes(outputIndex) as BaseNode[] | null) || [];
         const oInfo = node.getOutputInfo(outputIndex);
 
-        if (!oInfo || !BaseGenerator.isExecutionPin(oInfo.type) || oNodes.length === 0 || oInfo.links.length > 1) {
-            console.warn(`WARNING: Attemped to generate statement code for output ${outputIndex} of ${node.title} but output was not found or was not a flow type or there was more than 1 way to flow which confused the engine.`);
+        if (
+            !oInfo ||
+            !BaseGenerator.isExecutionPin(oInfo.type) ||
+            oNodes.length === 0 ||
+            oInfo.links.length > 1
+        ) {
+            console.warn(
+                `WARNING: Attemped to generate statement code for output ${outputIndex} of ${node.title} but output was not found or was not a flow type or there was more than 1 way to flow which confused the engine.`
+            );
             return JavaScriptConstantStrings.NoOp;
         }
 
         const oNode = oNodes[0];
 
         if (!this.hasGenerator(oNode)) {
-            console.warn(`WARNING: Attemped to generate statement code for output ${outputIndex} of ${node.title} but output node was not registered with the JavaScript generator for code generation.`);
+            console.warn(
+                `WARNING: Attemped to generate statement code for output ${outputIndex} of ${node.title} but output node was not registered with the JavaScript generator for code generation.`
+            );
             return JavaScriptConstantStrings.NoOp;
         }
 
@@ -105,11 +127,17 @@ export class JavaScriptGenerator extends BaseGenerator {
 
         while (processingNode) {
             // safe guard against possible infinite loop in case graph contains a circle
-            if (visited.has(processingNode.id)) throw new GenerationError("Unable to generate graph code as it contains circular dependencies.", GenerationErrorType.CircularDependency);
+            if (visited.has(processingNode.id))
+                throw new GenerationError(
+                    "Unable to generate graph code as it contains circular dependencies.",
+                    GenerationErrorType.CircularDependency
+                );
             visited.add(processingNode.id);
 
             if (!this.hasGenerator(processingNode)) {
-                console.log(`WARNING: Node ${processingNode.title} does not have a generator function`)
+                console.log(
+                    `WARNING: Node ${processingNode.title} does not have a generator function`
+                );
                 code.push(JavaScriptConstantStrings.NoOp);
                 continue;
             }
@@ -119,23 +147,23 @@ export class JavaScriptGenerator extends BaseGenerator {
             processingNode = this.getExecOutputNode(processingNode);
         }
 
-        return code.join("\n")
+        return code.join("\n");
     }
 
     isGhostNode(node: BaseNode) {
         let isConnected: boolean = false;
 
-        for(let i = 0; i < node.inputs.length; i++) {
-            if(node.isInputConnected(i)) {
+        for (let i = 0; i < node.inputs.length; i++) {
+            if (node.isInputConnected(i)) {
                 isConnected = true;
                 break;
             }
         }
 
-        if(isConnected) return isConnected;
+        if (isConnected) return isConnected;
 
-        for(let i = 0; i < node.inputs.length; i++) {
-            if(node.isOutputConnected(i)) {
+        for (let i = 0; i < node.inputs.length; i++) {
+            if (node.isOutputConnected(i)) {
                 isConnected = true;
                 break;
             }
@@ -153,7 +181,7 @@ export class JavaScriptGenerator extends BaseGenerator {
         // filter all the 'roots'
         const roots = nodes.filter((node) => {
             // filter and create import statements at the same time.
-            if(!this.isGhostNode(node)) this.collectImports(node);
+            if (!this.isGhostNode(node)) this.collectImports(node);
             return node instanceof RootNode;
         });
 
@@ -161,24 +189,29 @@ export class JavaScriptGenerator extends BaseGenerator {
 
         const defaultRootIndex = roots.findIndex((node) => node instanceof OnProgramStartNode);
 
-        if (defaultRootIndex === -1) throw new GenerationError("No 'On Program Start' root node found in the graph.");
+        if (defaultRootIndex === -1)
+            throw new GenerationError("No 'On Program Start' root node found in the graph.");
 
         const defaultRoot = roots.splice(defaultRootIndex, 1)[0] as OnProgramStartNode;
         roots.unshift(defaultRoot);
         // process each root node
         for (const root of roots) {
             if (!this.hasGenerator(root)) {
-                console.warn(`Cannot generate code for ${root.title}. This is a root node and nothing for this branch will be generated.`);
+                console.warn(
+                    `Cannot generate code for ${root.title}. This is a root node and nothing for this branch will be generated.`
+                );
                 continue;
             }
 
             codeString.push(this.executeGeneratorFunction(root)!);
         }
 
+        const imports = `${IMPORT_STATEMENT[0]}\n${this.generateImportStatements().join("\n").trimEnd()}\n${IMPORT_STATEMENT[1]}`;
+
+        // reset all the cache
+        this.imports.clear();
         this.visitedNodes.clear();
         this.codeCache.clear();
-
-        const imports = `${IMPORT_STATEMENT[0]}\n${this.generateImportStatements().join("\n").trimEnd()}\n${IMPORT_STATEMENT[1]}`;
 
         return `${imports}\n\n${codeString}`;
     }
@@ -190,7 +223,9 @@ export class JavaScriptGenerator extends BaseGenerator {
                 const modId = `object@${statement.from}`;
                 if (this.imports.has(modId)) {
                     const previousStatement = this.imports.get(modId)!;
-                    const filteredModules = statement.module.filter(v => !previousStatement.modules.includes(v));
+                    const filteredModules = statement.module.filter(
+                        (v) => !previousStatement.modules.includes(v)
+                    );
 
                     previousStatement.modules.push(...filteredModules);
                     this.imports.set(modId, previousStatement);
@@ -199,8 +234,8 @@ export class JavaScriptGenerator extends BaseGenerator {
                         modules: statement.module,
                         type: statement.type,
                         version: statement.packageVersion,
-                        package: statement.from
-                    })
+                        package: statement.from,
+                    });
                 }
             } else {
                 const modId = `${statement.module}@${statement.from}`;
@@ -211,8 +246,8 @@ export class JavaScriptGenerator extends BaseGenerator {
                     modules: [statement.module],
                     type: statement.type,
                     version: statement.packageVersion,
-                    package: statement.from
-                })
+                    package: statement.from,
+                });
             }
         }
     }
@@ -220,26 +255,31 @@ export class JavaScriptGenerator extends BaseGenerator {
     generateImportStatements() {
         const imports = this.imports.values();
 
-        return imports.map((v) => {
-            let statement = "";
+        return imports
+            .map((v) => {
+                let statement = "";
 
-            switch(v.type) {
-                case ImportType.Object: {
-                    statement = `import {\n${v.modules.map(s => `\t${s}`).join("\n").trimEnd()}\n}`;
-                    break;
+                switch (v.type) {
+                    case ImportType.Object: {
+                        statement = `import {\n${v.modules
+                            .map((s) => `\t${s}`)
+                            .join("\n")
+                            .trimEnd()}\n}`;
+                        break;
+                    }
+                    case ImportType.Everything: {
+                        statement = `import * as ${v.modules[0]}`;
+                        break;
+                    }
+                    default: {
+                        statement = `import ${v.modules[0]}`;
+                    }
                 }
-                case ImportType.Everything: {
-                    statement = `import * as ${v.modules[0]}`;
-                    break;
-                }
-                default: {
-                    statement = `import ${v.modules[0]}`;
-                }
-            }
 
-            statement += ` from "${v.package}"`;
+                statement += ` from "${v.package}";`;
 
-            return statement;
-        }).toArray();
+                return statement;
+            })
+            .toArray();
     }
 }
