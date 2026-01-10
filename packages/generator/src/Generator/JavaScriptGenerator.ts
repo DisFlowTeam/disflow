@@ -151,25 +151,11 @@ export class JavaScriptGenerator extends BaseGenerator {
     }
 
     isGhostNode(node: BaseNode) {
-        let isConnected: boolean = false;
+        if(node.isAnyOutputConnected()) return false;
 
-        for (let i = 0; i < node.inputs.length; i++) {
-            if (node.isInputConnected(i)) {
-                isConnected = true;
-                break;
-            }
+        for(const input of node.inputs) {
+            if(input.link) return false;
         }
-
-        if (isConnected) return isConnected;
-
-        for (let i = 0; i < node.inputs.length; i++) {
-            if (node.isOutputConnected(i)) {
-                isConnected = true;
-                break;
-            }
-        }
-
-        return isConnected;
     }
 
     graphToCode(graph: LGraph): string {
