@@ -1,6 +1,8 @@
 import type { LGraph, INodeInputSlot } from "litegraph.js";
-import { BaseNode, OnProgramStartNode, RootNode } from "../nodes";
+import { BaseNode, ImportType, OnProgramStartNode, RootNode } from "../nodes";
 import { BaseGenerator, GenerationError, GenerationErrorType } from "./BaseGenerator";
+
+const IMPORT_STATEMENT = ["// ------------ START DISFLOW IMPORT STATEMENTS ------------", "// ------------ END DISFLOW IMPORT STATEMENTS ------------"]
 
 export enum JavaScriptConstantStrings {
     Null = "null",
@@ -8,10 +10,19 @@ export enum JavaScriptConstantStrings {
     NoOp = "// NO OPERATION"
 }
 
+export interface JavaScriptImport {
+    modules: string[];
+    type: ImportType;
+    version: string;
+    package: string;
+}
+
 export class JavaScriptGenerator extends BaseGenerator {
     private visitedNodes = new Set<number>();
     // Cache for valueToCode since these statements can be somewhat computationally expensive
     private codeCache = new Map<number, string>();
+
+    private imports = new Map<string, JavaScriptImport>();
 
     // walk up the execution connections
     valueToCode(node: BaseNode, inputIndex: number): string {
@@ -25,7 +36,7 @@ export class JavaScriptGenerator extends BaseGenerator {
 
         if (this.visitedNodes.has(iNode.id)) throw new GenerationError("The graph contains circular dependencies", GenerationErrorType.CircularDependency);
 
-        if(this.codeCache.has(iNode.id)) return this.codeCache.get(iNode.id)!;
+        if (this.codeCache.has(iNode.id)) return this.codeCache.get(iNode.id)!;
 
         try {
             if (!this.hasGenerator(iNode)) {
@@ -33,7 +44,7 @@ export class JavaScriptGenerator extends BaseGenerator {
                 return JavaScriptConstantStrings.Null;
             }
 
-            this.visitedNodes.add(iNode.id)
+            this.visitedNodes.add(iNode.id);
 
             const code = this.executeGeneratorFunction(iNode)!;
             this.codeCache.set(iNode.id, code);
@@ -111,6 +122,28 @@ export class JavaScriptGenerator extends BaseGenerator {
         return code.join("\n")
     }
 
+    isGhostNode(node: BaseNode) {
+        let isConnected: boolean = false;
+
+        for(let i = 0; i < node.inputs.length; i++) {
+            if(node.isInputConnected(i)) {
+                isConnected = true;
+                break;
+            }
+        }
+
+        if(isConnected) return isConnected;
+
+        for(let i = 0; i < node.inputs.length; i++) {
+            if(node.isOutputConnected(i)) {
+                isConnected = true;
+                break;
+            }
+        }
+
+        return isConnected;
+    }
+
     graphToCode(graph: LGraph): string {
         let codeString: string[] = [];
 
@@ -118,7 +151,11 @@ export class JavaScriptGenerator extends BaseGenerator {
         const nodes = graph._nodes as BaseNode[];
 
         // filter all the 'roots'
-        const roots = nodes.filter((node) => node instanceof RootNode);
+        const roots = nodes.filter((node) => {
+            // filter and create import statements at the same time.
+            if(!this.isGhostNode(node)) this.collectImports(node);
+            return node instanceof RootNode;
+        });
 
         if (roots.length === 0) throw new GenerationError("Node roots were found in the graph.");
 
@@ -141,6 +178,68 @@ export class JavaScriptGenerator extends BaseGenerator {
         this.visitedNodes.clear();
         this.codeCache.clear();
 
-        return codeString.join("\n");
+        const imports = `${IMPORT_STATEMENT[0]}\n${this.generateImportStatements().join("\n").trimEnd()}\n${IMPORT_STATEMENT[1]}`;
+
+        return `${imports}\n\n${codeString}`;
+    }
+
+    // ---------- START IMPORT PROCESSING ----------
+    collectImports(node: BaseNode) {
+        for (const statement of node.imports) {
+            if (statement.type === ImportType.Object) {
+                const modId = `object@${statement.from}`;
+                if (this.imports.has(modId)) {
+                    const previousStatement = this.imports.get(modId)!;
+                    const filteredModules = statement.module.filter(v => !previousStatement.modules.includes(v));
+
+                    previousStatement.modules.push(...filteredModules);
+                    this.imports.set(modId, previousStatement);
+                } else {
+                    this.imports.set(modId, {
+                        modules: statement.module,
+                        type: statement.type,
+                        version: statement.packageVersion,
+                        package: statement.from
+                    })
+                }
+            } else {
+                const modId = `${statement.module}@${statement.from}`;
+
+                if (this.imports.has(modId)) continue; // alraedy cached
+
+                this.imports.set(modId, {
+                    modules: [statement.module],
+                    type: statement.type,
+                    version: statement.packageVersion,
+                    package: statement.from
+                })
+            }
+        }
+    }
+
+    generateImportStatements() {
+        const imports = this.imports.values();
+
+        return imports.map((v) => {
+            let statement = "";
+
+            switch(v.type) {
+                case ImportType.Object: {
+                    statement = `import {\n${v.modules.map(s => `\t${s}`).join("\n").trimEnd()}\n}`;
+                    break;
+                }
+                case ImportType.Everything: {
+                    statement = `import * as ${v.modules[0]}`;
+                    break;
+                }
+                default: {
+                    statement = `import ${v.modules[0]}`;
+                }
+            }
+
+            statement += ` from "${v.package}"`;
+
+            return statement;
+        }).toArray();
     }
 }
