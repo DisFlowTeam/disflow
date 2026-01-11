@@ -1,6 +1,5 @@
 import { BaseGenerator, BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
-import type { LLink, INodeOutputSlot, INodeInputSlot } from "litegraph.js";
 
 export class Print extends BaseNode {
     static title: string = "Print";
@@ -9,11 +8,11 @@ export class Print extends BaseNode {
     protected onBuild(): void {
         this.setNodeColor(NodeCategoryColor.Console);
         this.addInput("Content", FlowIOTypes.Any);
-        this.addProperty("content", "Hello, World!", FlowIOTypes.String);
+        this.addProperty("content", "", FlowIOTypes.String);
 
-        this.addWidget("text", "Content", "Hello, World!", (v: string) => {
-            // if(v.trim() === "") this.addInput("content", FlowIOTypes.Any);
-            // else this.removeInput(1);
+        this.addWidget("text", "Content", "", (v: string) => {
+            if(v.trim() === "" && !this.inputs.at(1)) this.addInput("content", FlowIOTypes.Any);
+            else if(this.inputs.at(1)) this.removeInput(1);
 
             this.properties.content = v;
         }, {

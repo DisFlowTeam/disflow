@@ -21,6 +21,9 @@ export interface BaseImportDeclaration {
     from: string;
     packageVersion: string;
     type: ImportType;
+    isFromNodeJS?: boolean;
+    initialiser?: string;
+    cleanup?: string;
 }
 
 export interface ObjectImportDeclaration extends BaseImportDeclaration {

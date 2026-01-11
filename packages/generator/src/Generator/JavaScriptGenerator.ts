@@ -26,6 +26,8 @@ export class JavaScriptGenerator extends BaseGenerator {
     private codeCache = new Map<number, string>();
 
     private imports = new Map<string, JavaScriptImport>();
+    private initialisers = new Set<string>();
+    private cleanupCode = new Set<string>();
 
     // walk up the execution connections
     valueToCode(node: BaseNode, inputIndex: number): string {
@@ -193,18 +195,25 @@ export class JavaScriptGenerator extends BaseGenerator {
         }
 
         const imports = `${IMPORT_STATEMENT[0]}\n${this.generateImportStatements().join("\n").trimEnd()}\n${IMPORT_STATEMENT[1]}`;
+        const initialisers = this.generateInitialiserStatements().join("\n\n");
+        const cleanups = this.generateCleanUpStatements().join("\n\n");
 
         // reset all the cache
         this.imports.clear();
         this.visitedNodes.clear();
         this.codeCache.clear();
+        this.initialisers.clear();
+        this.cleanupCode.clear();
 
-        return `${imports}\n\n${codeString}`;
+        return `${imports}\n\n${initialisers.trimEnd()}\n\n${codeString}\n\n${cleanups}`;
     }
 
     // ---------- START IMPORT PROCESSING ----------
     collectImports(node: BaseNode) {
         for (const statement of node.imports) {
+            if(statement.initialiser && !this.initialisers.has(statement.initialiser)) this.initialisers.add(statement.initialiser);
+            if(statement.cleanup && !this.cleanupCode.has(statement.cleanup)) this.cleanupCode.add(statement.cleanup);
+
             if (statement.type === ImportType.Object) {
                 const modId = `object@${statement.from}`;
                 if (this.imports.has(modId)) {
@@ -236,6 +245,14 @@ export class JavaScriptGenerator extends BaseGenerator {
                 });
             }
         }
+    }
+
+    generateInitialiserStatements() {
+        return this.initialisers.values().toArray();
+    }
+
+    generateCleanUpStatements() {
+        return this.cleanupCode.values().toArray();
     }
 
     generateImportStatements() {

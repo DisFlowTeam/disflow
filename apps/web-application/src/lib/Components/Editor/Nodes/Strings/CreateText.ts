@@ -1,6 +1,5 @@
 import { BaseNode, FlowIOTypes, BaseGenerator } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
-import type { LLink, INodeInputSlot, INodeOutputSlot } from "litegraph.js";
 
 export class CreateText extends BaseNode {
 
