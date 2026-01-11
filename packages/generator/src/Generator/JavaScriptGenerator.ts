@@ -18,6 +18,7 @@ export interface JavaScriptImport {
     type: ImportType;
     version: string;
     package: string;
+    isNode: boolean;
 }
 
 export class JavaScriptGenerator extends BaseGenerator {
@@ -160,7 +161,7 @@ export class JavaScriptGenerator extends BaseGenerator {
         }
     }
 
-    graphToCode(graph: LGraph): string {
+    graphToCode(graph: LGraph): { code: string, meta: string } {
         let codeString: string[] = [];
 
         // @ts-expect-error need to get all nodes. Could not find any public API to do so (even though there should be one there)
@@ -198,6 +199,12 @@ export class JavaScriptGenerator extends BaseGenerator {
         const initialisers = this.generateInitialiserStatements().join("\n\n");
         const cleanups = this.generateCleanUpStatements().join("\n\n");
 
+        const jsonDeps: Record<string, string> = {}
+
+        for(const dep of this.imports.values().filter(v => !v.isNode)) {
+            jsonDeps[dep.package.split("/")[0]] = dep.version;
+        }
+
         // reset all the cache
         this.imports.clear();
         this.visitedNodes.clear();
@@ -205,7 +212,10 @@ export class JavaScriptGenerator extends BaseGenerator {
         this.initialisers.clear();
         this.cleanupCode.clear();
 
-        return `${imports}\n\n${initialisers.trimEnd()}\n\n${codeString}\n\n${cleanups}`;
+        return {
+            code: `${imports}\n\n${initialisers.trimEnd()}\n\n${codeString}\n\n${cleanups}`,
+            meta: JSON.stringify({ dependencies: jsonDeps }, null, "\t")
+        };
     }
 
     // ---------- START IMPORT PROCESSING ----------
@@ -230,6 +240,7 @@ export class JavaScriptGenerator extends BaseGenerator {
                         type: statement.type,
                         version: statement.packageVersion,
                         package: statement.from,
+                        isNode: statement.isFromNodeJS || false
                     });
                 }
             } else {
@@ -242,6 +253,7 @@ export class JavaScriptGenerator extends BaseGenerator {
                     type: statement.type,
                     version: statement.packageVersion,
                     package: statement.from,
+                    isNode: statement.isFromNodeJS || false
                 });
             }
         }

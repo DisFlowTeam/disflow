@@ -4,6 +4,7 @@
 	import hljs from 'highlight.js';
 	import 'highlight.js/styles/vs.css';
 	import javascript from 'highlight.js/lib/languages/javascript';
+	import json from 'highlight.js/lib/languages/json';
 	import 'litegraph.js/css/litegraph.css';
 	import { LGraphCanvas, LiteGraph } from 'litegraph.js';
 	import { JavaScriptGenerator, OnProgramStartNode } from '@disflow-team/code-gen';
@@ -15,30 +16,25 @@
 	const originalAddItem = LiteGraph.ContextMenu.prototype.addItem;
 
 	LiteGraph.ContextMenu.prototype.addItem = function (name, value, options) {
-		const element = originalAddItem.call(
-			this,
-			name,
-			value,
-			options
-		) as HTMLDivElement | undefined;
+		const element = originalAddItem.call(this, name, value, options) as HTMLDivElement | undefined;
 
 		if (element && element.classList.contains('has_submenu')) {
-			const key = name.replaceAll(" ", "");
+			const key = name.replaceAll(' ', '');
 			if (key in NodeCategoryColor) {
-				
 				const color = NodeCategoryColor[key as keyof typeof NodeCategoryColor];
-    			element.style.borderRightColor = color;
+				element.style.borderRightColor = color;
 			}
 		}
 
 		return element;
 	};
 
-
-	let code = '';
+	let code = $state('');
+	let pkg = $state('');
 
 	LiteGraph.clearRegisteredTypes();
 	hljs.registerLanguage('javascript', javascript);
+	hljs.registerLanguage('json', json);
 
 	const engine = new JavaScriptGenerator();
 
@@ -73,7 +69,7 @@
 				autoresize: false
 			}
 		);
-		
+
 		c.frame = 30;
 		c.zoom_modify_alpha = false;
 
@@ -94,7 +90,10 @@
 	<button
 		class="absolute top-24 right-11 bg-blue-700 rounded-lg p-2"
 		onclick={() => {
-			code = hljs.highlight(engine.graphToCode(getGraph()), { language: 'javascript' }).value;
+			const c = engine.graphToCode(getGraph());
+			code = hljs.highlight(c.code, { language: 'javascript' }).value;
+			const json = c.meta;
+			pkg = hljs.highlight(json, { language: "json" }).value;
 			dialog.showModal();
 		}}>Generate Code</button
 	>
@@ -108,6 +107,9 @@
 >
 	<div class="w-11/12 h-11/12 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">
 		<pre><code>{@html code}</code></pre>
+	</div>
+	<div class="w-11/12 h-11/12 mt-5 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">
+		<pre><code>{@html pkg}</code></pre>
 	</div>
 	<div class="w-11/12 h-1/12 mx-auto flex items-center">
 		<button

@@ -1,4 +1,4 @@
-import { BaseGenerator, BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
+import { BaseGenerator, BaseNode, FlowIOTypes, ImportType } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
 
 export class Print extends BaseNode {
