@@ -22,7 +22,7 @@ export abstract class BaseGenerator {
 
     abstract valueToCode(node: BaseNode, inputIndex: number): string;
     abstract statementToCode(node: BaseNode, inputIndex: number): string;
-    abstract graphToCode(graph: LGraph): string;
+    abstract graphToCode(graph: LGraph): { code: string, meta: string };
 
     static isExecutionPin(type: string | number): boolean {
         return type === LiteGraph.ACTION || type === LiteGraph.EVENT || type === -1 || type === FlowIOTypes.Flow;

@@ -1,6 +1,5 @@
-import { BaseGenerator, BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
+import { BaseGenerator, BaseNode } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
-import type { LLink, INodeOutputSlot, INodeInputSlot } from "litegraph.js";
 
 export class ClearConsole extends BaseNode {
     static title: string = "Clear Console";

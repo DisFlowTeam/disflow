@@ -25,5 +25,5 @@ export enum FlowIOColor {
     Any = "#9CA3AF",
     Boolean = "#FF5C5C",
     Flow = "#E5484D"
-  }
+}
   

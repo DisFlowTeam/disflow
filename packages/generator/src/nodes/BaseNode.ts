@@ -11,6 +11,47 @@ declare module "litegraph.js" {
     }
 }
 
+export enum ImportType {
+    Object, // import { Module } from "mod";
+    Default, // import Module from "mod";
+    Everything // import * as Module from "mod";
+}
+
+export interface BaseImportDeclaration {
+    from: string;
+    packageVersion: string;
+    type: ImportType;
+    isFromNodeJS?: boolean;
+    initialiser?: string;
+    cleanup?: string;
+}
+
+export interface ObjectImportDeclaration extends BaseImportDeclaration {
+    module: string[];
+    type: ImportType.Object
+}
+
+export interface ImportDeclaration extends BaseImportDeclaration {
+    module: string;
+    type: ImportType.Default | ImportType.Everything;
+}
+
+export type AllImportDeclaration = ObjectImportDeclaration | ImportDeclaration;
+export type AllImportDeclarationRaw = AllImportDeclaration & {
+    importId: string;
+}
+
+export function constructImportId(statement: AllImportDeclaration) {
+    let importId = "";
+
+    if (statement.type === ImportType.Object) importId = `[${statement.module.sort().join("|")}]`;
+    else importId = statement.module;
+
+    importId += `@${statement.from}`;
+
+    return importId;
+}
+
 export abstract class BaseNode extends LGraphNode {
     static title: string;
     static category: string;
@@ -20,9 +61,11 @@ export abstract class BaseNode extends LGraphNode {
     category: string;
     indentExec = true;
 
+    imports = new Set<AllImportDeclarationRaw>();
+
     constructor() {
         super();
-        
+
         const childNode = (this.constructor as typeof BaseNode);
 
         if (!childNode.noFlows) {
@@ -38,6 +81,14 @@ export abstract class BaseNode extends LGraphNode {
 
     private generateBgColor(color: string) {
         return color + "BB";
+    }
+
+    addImport(type: AllImportDeclaration) {
+        const importId = constructImportId(type);
+        Object.assign(type, {
+            importId: importId
+        });
+        this.imports.add(type as unknown as AllImportDeclarationRaw);
     }
 
     setNodeColor(hexadecimal: string) {
@@ -80,11 +131,11 @@ export abstract class BaseNode extends LGraphNode {
     }
 
     onOutputAdded(output: INodeOutputSlot) {
-        if(BaseGenerator.isExecutionPin(output.type)) output.shape = LiteGraph.ARROW_SHAPE;
+        if (BaseGenerator.isExecutionPin(output.type)) output.shape = LiteGraph.ARROW_SHAPE;
     }
 
     onInputAdded(input: INodeInputSlot) {
-        if(BaseGenerator.isExecutionPin(input.type)) input.shape = LiteGraph.ARROW_SHAPE;
+        if (BaseGenerator.isExecutionPin(input.type)) input.shape = LiteGraph.ARROW_SHAPE;
     }
 
     /**
