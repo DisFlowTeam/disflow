@@ -1,4 +1,4 @@
-import { user } from "../MainGun.svelte";
+import { getGunUser } from "../MainGun.svelte";
 import { GunNode } from "./GunNode";
 
 export interface Project {
@@ -14,10 +14,15 @@ export class CommandNode extends GunNode {
     commandId: string;
 
     constructor(projectId: string, commandId: string) {
-        super(user.get(CommandNode.createNamespace(projectId, commandId)));
+        super(getGunUser().get(CommandNode.createNamespace(projectId, commandId)));
 
         this.projectId = projectId;
         this.commandId = commandId;
+    }
+
+    async graph(): Promise<string|undefined> {
+        // @ts-expect-error
+        return structuredClone(await this.chain.get("graph").get("main").then() as string | undefined);
     }
 
     static createNamespace(projectId: string, commandId: string) {
@@ -29,12 +34,19 @@ export class CommandNode extends GunNode {
         
         return await projectNode.createCommand(commandId);
     }
+
+    async saveGraph(graphData: object) {
+        // @ts-expect-error
+        await this.chain.get("graph").put({
+            main: JSON.stringify(graphData)
+        });
+    }
 }
 
 export class ProjectNode extends GunNode {
     static async createProject(param: Project) {
         // @ts-expect-error
-        await user.get("projects").get(param.id as never).put(param)
+        await getGunUser().get("projects").get(param.id as never).put(param)
     }
 
     static async getProject(projectId: string) {
@@ -43,7 +55,7 @@ export class ProjectNode extends GunNode {
 
     static watchProjects(callback: (p: Project) => unknown) {
         // @ts-expect-error
-        const ev = user.get("projects").map().on((v: Project | null) => {
+        const ev = getGunUser().get("projects").map().on((v: Project | null) => {
             if(!v) return;
             callback(v);
         })
@@ -54,7 +66,7 @@ export class ProjectNode extends GunNode {
     id: string;
 
     constructor(projectId: string) {
-        const chain = user.get("projects").get(projectId as never);
+        const chain = getGunUser().get("projects").get(projectId as never);
         
         super(chain);
 
@@ -67,14 +79,37 @@ export class ProjectNode extends GunNode {
     }
 
     async createCommand(id: string) {
-        (this.chain.get("commands" as never) as any).get(id).put(1);
+        (this.chain.get("commands" as never) as any).get(id).put(Date.now());
 
         return new CommandNode(this.id, id);
     }
 
-    metadata() {
-        return new Promise<Project>((resolve) => {
-            this.chain.once((v) => resolve(v as unknown as Project));
+    async metadata(): Promise<Project> {
+        // @ts-expect-error
+        return await this.chain.then();
+    }
+
+    async saveGraph(graphData: object) {
+        // @ts-expect-error
+        await this.chain.get("graph").put({
+            // Lazy load the graph data
+            main: JSON.stringify(graphData)
         });
+    }
+
+    async graph(): Promise<string | void> {
+        // @ts-expect-error
+        return structuredClone(await this.chain.get("graph").get("main").then() as string | void);
+    }
+
+    watchCommands(fn: (cmd: { updatedAt: number, name: string }) => unknown) {
+        // @ts-expect-error
+        const ev = this.chain.get("commands" as never).map().on((val: number, key: string) => {
+            fn({ updatedAt: val, name: key });
+        })
+
+        return () => {
+            ev?.off();
+        }
     }
 }

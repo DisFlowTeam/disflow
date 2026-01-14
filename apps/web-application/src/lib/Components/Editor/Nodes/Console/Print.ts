@@ -7,7 +7,6 @@ export class Print extends BaseNode {
 
     protected onBuild(): void {
         this.setNodeColor(NodeCategoryColor.Console);
-        this.addInput("Content", FlowIOTypes.Any);
         this.addProperty("content", "", FlowIOTypes.String);
 
         this.addWidget("text", "Content", "", (v: string) => {
@@ -18,6 +17,10 @@ export class Print extends BaseNode {
         }, {
             property: "content"
         })
+
+        setTimeout(() => {
+            if(!this.properties.content) this.addInput("Content", FlowIOTypes.Any);
+        }, 100)
     }
 
     nodeToCode(generator: BaseGenerator): string {

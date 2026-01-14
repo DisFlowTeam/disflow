@@ -17,9 +17,10 @@
 				.metadata()
 				.then((p) => {
 					infoFetched = true;
-					project = structuredClone(p);
+					const pro = structuredClone(p);
+					project = pro;
 
-					console.log('[GUN] RECIEVED PROJECT OBJECT: ', project);
+					console.log('[GUN] RECIEVED PROJECT OBJECT: ', pro);
 				})
 				.catch(() => {
 					goto('/');

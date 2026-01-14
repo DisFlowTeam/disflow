@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ProjectBanner from '$lib/Components/Dashboard/Projects/ProjectBanner.svelte';
-	import { BACKEND_URL, user, ProjectNode, logged } from '$lib';
+	import { BACKEND_URL, ProjectNode, logged, getGunUser } from '$lib';
 	import { onMount } from 'svelte';
 	import Swal from 'sweetalert2';
 	import { makeRequestJson, type UserData } from '$lib/Gun/Utils';
@@ -67,7 +67,7 @@
 					}
 
 					const projectExists = await new Promise<boolean>((res) =>
-						user
+						getGunUser()
 							.get('projects')
 							.get(inputValue)
 							.once((data) => res(!!data))
@@ -114,7 +114,7 @@
 						}
 
 						const projectExists = await new Promise<boolean>((res) =>
-							user
+							getGunUser()
 								.get('projects')
 								.get(botInfoResult.value!.id as any)
 								.once((data) => res(!!data))

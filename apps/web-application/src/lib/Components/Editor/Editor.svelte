@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createEditor, getGraph } from '@disflow-team/utils';
-	import hljs from 'highlight.js';
 	import 'highlight.js/styles/vs.css';
-	import javascript from 'highlight.js/lib/languages/javascript';
-	import json from 'highlight.js/lib/languages/json';
 	import 'litegraph.js/css/litegraph.css';
 	import { LGraphCanvas, LiteGraph } from 'litegraph.js';
 	import { JavaScriptGenerator, OnProgramStartNode } from '@disflow-team/code-gen';
@@ -12,6 +9,15 @@
 	import * as Nodes from './Nodes';
 	import { FlowIOColor } from './Nodes/Colors';
 	import { NodeCategoryColor } from './Nodes/Colors';
+	import { ProjectNode } from '$lib/Gun';
+
+	let {
+		project,
+		commandId
+	}: {
+		project: string | ProjectNode;
+		commandId?: string;
+	} = $props();
 
 	const originalAddItem = LiteGraph.ContextMenu.prototype.addItem;
 
@@ -29,12 +35,9 @@
 		return element;
 	};
 
-	let code = $state('');
-	let pkg = $state('');
-
 	LiteGraph.clearRegisteredTypes();
-	hljs.registerLanguage('javascript', javascript);
-	hljs.registerLanguage('json', json);
+	// hljs.registerLanguage('javascript', javascript);
+	// hljs.registerLanguage('json', json);
 
 	const engine = new JavaScriptGenerator();
 
@@ -47,7 +50,6 @@
 	}
 
 	let canvas: HTMLCanvasElement;
-	let dialog: HTMLDialogElement;
 
 	let flowColors: Record<string, string> = {};
 
@@ -57,7 +59,7 @@
 		flowColors[flowValues[i]] = FlowIOColor[v];
 	});
 
-	onMount(() => {
+	onMount(async () => {
 		const rect = canvas.getBoundingClientRect();
 		canvas.width = rect.width;
 		canvas.height = rect.height;
@@ -83,40 +85,76 @@
 
 			graph.add(node);
 		}
+
+		// Load the from the database
+		let graphData: object | undefined;
+		const prjData = typeof project === 'string' ? new ProjectNode(project) : project;
+
+		if (commandId) {
+			const command = prjData.command(commandId);
+			const d = await command.graph();
+			try {
+				if (d) graphData = JSON.parse(d);
+			} catch (error) {
+				console.log('Unable to parse graph data ...');
+			}
+		} else {
+			const d = await prjData.graph();
+
+			try {
+				if (d) graphData = JSON.parse(d);
+			} catch (error) {
+				console.log('Unable to parse graph data ...');
+			}
+		}
+
+		if (graphData) {
+			graph.configure(graphData, false);
+		}
 	});
+
+	async function save() {
+		const graph = getGraph();
+
+		const data = graph.serialize();
+
+		if (data) {
+			const prjData = typeof project === 'string' ? new ProjectNode(project) : project;
+
+			if (commandId) {
+				const command = prjData.command(commandId);
+
+				command.saveGraph(data);
+			} else {
+				prjData.saveGraph(data);
+			}
+		}
+	}
 </script>
 
+<div
+	class="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.8)] px-7 py-2 rounded-full ring-1 ring-white/5"
+>
+	<button class="btn-style" onclick={() => save()}>Save</button>
+	<button class="btn-style" onclick={() => {
+		save().then(() => window.history.back());
+	}}>Save and Exit</button>
+	<button onclick={() => window.history.back()} class="btn-style btn-danger">Exit</button>
+</div>
 <div class="flex h-[calc(100vh-5rem)] w-screen">
-	<button
-		class="absolute top-24 right-11 bg-blue-700 rounded-lg p-2"
-		onclick={() => {
-			const c = engine.graphToCode(getGraph());
-			code = hljs.highlight(c.code, { language: 'javascript' }).value;
-			const json = c.meta;
-			pkg = hljs.highlight(json, { language: "json" }).value;
-			dialog.showModal();
-		}}>Generate Code</button
-	>
 	<canvas bind:this={canvas} class="h-full w-screen"></canvas>
 </div>
 
-<dialog
-	bind:this={dialog}
-	open={false}
-	class="h-[calc(100vh-5rem)] max-w-[100vw] p-3 w-screen absolute top-20 left-0 bg-gray-900"
->
-	<div class="w-11/12 h-11/12 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">
-		<pre><code>{@html code}</code></pre>
-	</div>
-	<div class="w-11/12 h-11/12 mt-5 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">
-		<pre><code>{@html pkg}</code></pre>
-	</div>
-	<div class="w-11/12 h-1/12 mx-auto flex items-center">
-		<button
-			class="bg-blue-700 py-2 px-6 rounded-md"
-			onclick={() => {
-				dialog.close();
-			}}>Close</button
-		>
-	</div>
-</dialog>
+<style>
+	@reference "../../../app.css";
+
+	@layer {
+		.btn-style {
+			@apply text-blue-400 cursor-pointer border-blue-400 px-4 py-1 border-2 rounded-4xl hover:rounded-lg hover:text-blue-500 hover:border-blue-500 transition-all;
+		}
+
+		.btn-danger {
+			@apply text-red-400 border-red-400 hover:text-red-500 hover:border-red-500;
+		}
+	}
+</style>
