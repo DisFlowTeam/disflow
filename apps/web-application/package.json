@@ -34,9 +34,12 @@
 	"dependencies": {
 		"@disflow-team/code-gen": "workspace:^",
 		"@disflow-team/utils": "workspace:^",
+		"@lucide/svelte": "^0.562.0",
 		"@tailwindcss/vite": "^4.1.18",
+		"gun": "^0.2020.1241",
 		"highlight.js": "^11.11.1",
 		"litegraph.js": "^0.7.18",
+		"sweetalert2": "^11.26.17",
 		"tailwindcss": "^4.1.18"
 	}
 }

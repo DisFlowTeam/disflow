@@ -1,0 +1,1 @@
+<button class="text-red-400 cursor-pointer border-red-400 px-3 py-2 border-2 rounded-lg hover:rounded-sm hover:text-red-500 hover:border-red-500 transition-all">Log Out</button>

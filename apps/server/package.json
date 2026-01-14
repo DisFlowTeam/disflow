@@ -1,0 +1,23 @@
+{
+    "name": "@disflow-team/server",
+    "description": "A simple express server for oauth2 flow.",
+    "dependencies": {
+        "connect-redis": "^9.0.0",
+        "cors": "^2.8.5",
+        "express": "^5.2.1",
+        "express-session": "^1.18.2",
+        "gun": "^0.2020.1241",
+        "mongoose": "^9.1.3",
+        "redis": "^5.10.0"
+    },
+    "devDependencies": {
+        "@disflow-team/tsconfig": "workspace:^",
+        "@types/cors": "^2.8.19",
+        "@types/express-session": "^1",
+        "tsup": "^8.5.1"
+    },
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup && node --env-file=.env dist/index.js"
+    }
+}
