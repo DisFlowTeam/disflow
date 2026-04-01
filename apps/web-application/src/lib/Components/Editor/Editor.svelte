@@ -69,7 +69,7 @@
 				autoresize: false
 			}
 		);
-
+		
 		c.frame = 30;
 		c.zoom_modify_alpha = false;
 
