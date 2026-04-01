@@ -69,7 +69,7 @@
 				autoresize: false
 			}
 		);
-		
+
 		c.frame = 30;
 		c.zoom_modify_alpha = false;
 
@@ -93,7 +93,7 @@
 			const c = engine.graphToCode(getGraph());
 			code = hljs.highlight(c.code, { language: 'javascript' }).value;
 			const json = c.meta;
-			pkg = hljs.highlight(json, { language: "json" }).value;
+			pkg = hljs.highlight(json, { language: 'json' }).value;
 			dialog.showModal();
 		}}>Generate Code</button
 	>

@@ -8,24 +8,22 @@
     ],
     "devDependencies": {
         "@disflow-team/tsconfig": "workspace:^",
-        "@typescript-eslint/eslint-plugin": "^8.50.0",
-        "@typescript-eslint/parser": "^8.50.0",
-        "eslint": "^9.39.2",
-        "eslint-config-prettier": "^10.1.8",
-        "litegraph.js": "^0.7.18",
-        "tsup": "^8.5.1"
+        "litegraph.js": "^0.7.18"
     },
     "scripts": {
-        "build": "tsup",
+        "build": "tsdown --config ./tsdown.config.ts",
         "lint": "eslint src --ext .ts --fix",
         "prettier": "prettier --write .",
         "prettier:check": "prettier --check ."
     },
     "exports": {
         ".": {
-            "types": "./dist/index.d.ts",
             "import": "./dist/index.mjs",
-            "require": "./dist/index.js"
+            "require": "./dist/index.cjs",
+            "types": {
+                "import": "./dist/index.d.mts",
+                "require": "./dist/index.d.cts"
+            }
         }
     },
     "dependencies": {

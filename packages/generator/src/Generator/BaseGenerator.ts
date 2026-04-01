@@ -5,7 +5,7 @@ import { FlowIOTypes } from "../types";
 
 export enum GenerationErrorType {
     Arbitrary,
-    CircularDependency
+    CircularDependency,
 }
 
 export class GenerationError extends Error {
@@ -22,18 +22,28 @@ export abstract class BaseGenerator {
 
     abstract valueToCode(node: BaseNode, inputIndex: number): string;
     abstract statementToCode(node: BaseNode, inputIndex: number): string;
-    abstract graphToCode(graph: LGraph): { code: string, meta: string };
+    abstract graphToCode(graph: LGraph): { code: string; meta: string };
 
     static isExecutionPin(type: string | number): boolean {
-        return type === LiteGraph.ACTION || type === LiteGraph.EVENT || type === -1 || type === FlowIOTypes.Flow;
+        return (
+            type === LiteGraph.ACTION ||
+            type === LiteGraph.EVENT ||
+            type === -1 ||
+            type === FlowIOTypes.Flow
+        );
     }
 
     indent(str: string) {
-        return str.split("\n").map(l => `\t${l}`).join("\n");
+        return str
+            .split("\n")
+            .map((l) => `\t${l}`)
+            .join("\n");
     }
 
     getExecOutputNode(node: BaseNode): BaseNode | null {
-        const outputData = node.outputs.findIndex((output) => output.name === "Exec" && BaseGenerator.isExecutionPin(output.type));
+        const outputData = node.outputs.findIndex(
+            (output) => output.name === "Exec" && BaseGenerator.isExecutionPin(output.type)
+        );
         if (outputData === -1) return null;
         const outputNode = node.getOutputNodes(outputData) as BaseNode[] | null;
 
@@ -47,6 +57,6 @@ export abstract class BaseGenerator {
     executeGeneratorFunction(node: BaseNode) {
         const refName = this.nodes.get(node.buildReferenceName());
 
-        if(refName) return refName(node, this);
+        if (refName) return refName(node, this);
     }
 }

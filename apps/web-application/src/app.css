@@ -1,74 +1,74 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-    --color-blurple-900: #131823;
-    --color-plurple-950: #10151f;
+	--color-blurple-900: #131823;
+	--color-plurple-950: #10151f;
 }
 
 @layer {
-    .landing-flows {
-        @apply w-52 h-32 rounded-xl
-    }
+	.landing-flows {
+		@apply w-52 h-32 rounded-xl;
+	}
 
-    .scale-container {
-        @apply lg:w-[70%] lg:left-[15%] h-[70%] md:w-[70%] md:left-[15%] lg:top-[15%] md:top-[15%] w-full left-0 z-20
-    }
+	.scale-container {
+		@apply lg:w-[70%] lg:left-[15%] h-[70%] md:w-[70%] md:left-[15%] lg:top-[15%] md:top-[15%] w-full left-0 z-20;
+	}
 
-    /* main menu container */
-    .litecontextmenu {
-        @apply bg-[#222222]! border! border-[#444444]! rounded-lg! shadow-2xl! py-1! font-sans! min-w-20!;
-    }
+	/* main menu container */
+	.litecontextmenu {
+		@apply bg-[#222222]! border! border-[#444444]! rounded-lg! shadow-2xl! py-1! font-sans! min-w-20!;
+	}
 
-    /* menu items */
-    .litecontextmenu .litemenu-entry {
-        @apply text-[#eeeeee]! px-5! py-1! mx-1! my-0.5! rounded! text-sm! transition-colors! duration-200! cursor-pointer!;
-    }
+	/* menu items */
+	.litecontextmenu .litemenu-entry {
+		@apply text-[#eeeeee]! px-5! py-1! mx-1! my-0.5! rounded! text-sm! transition-colors! duration-200! cursor-pointer!;
+	}
 
-    /* add hover animation to main menu and menu items */
-    .litecontextmenu .litemenu-entry:hover {
-        @apply bg-[#336699]! text-white!;
-    }
+	/* add hover animation to main menu and menu items */
+	.litecontextmenu .litemenu-entry:hover {
+		@apply bg-[#336699]! text-white!;
+	}
 
-    /* add seperators */
-    .litecontextmenu .litemenu-entry.separator {
-        @apply my-1! border-b! border-[#444444]! h-0! p-0!;
-    }
+	/* add seperators */
+	.litecontextmenu .litemenu-entry.separator {
+		@apply my-1! border-b! border-[#444444]! h-0! p-0!;
+	}
 
-    /* selected items */
-    .litecontextmenu .litemenu-entry.selected {
-        @apply bg-[#444444]!;
-    }
+	/* selected items */
+	.litecontextmenu .litemenu-entry.selected {
+		@apply bg-[#444444]!;
+	}
 
-    .litemenu-entry.has_submenu {
-        @apply border-r-2!;
-    }
+	.litemenu-entry.has_submenu {
+		@apply border-r-2!;
+	}
 
-    /* The search box */
-    .litesearchbox {
-        @apply bg-[#444444]! rounded-sm! text-gray-200!
-    }
+	/* The search box */
+	.litesearchbox {
+		@apply bg-[#444444]! rounded-sm! text-gray-200!;
+	}
 
-    .litesearchbox input {
-        @apply rounded-sm! bg-[#404040]!
-    }
+	.litesearchbox input {
+		@apply rounded-sm! bg-[#404040]!;
+	}
 
-    .litesearchbox .helper {
-        @apply px-px! bg-[#404040]!
-    }
+	.litesearchbox .helper {
+		@apply px-px! bg-[#404040]!;
+	}
 
-    .litesearchbox .lite-search-item {
-        @apply px-2! my-0.5! rounded-sm!
-    }
-    
-    .graphdialog {
-        @apply text-white! p-3! bg-[#222222]!
-    }
+	.litesearchbox .lite-search-item {
+		@apply px-2! my-0.5! rounded-sm!;
+	}
 
-    .graphdialog button {
-        @apply rounded-md! px-2! text-center! ml-3! hover:bg-[#404040]! bg-[#444444]! transition-colors! cursor-pointer!
-    }
+	.graphdialog {
+		@apply text-white! p-3! bg-[#222222]!;
+	}
 
-    .graphdialog input {
-        @apply rounded-md! bg-[#444444]!
-    }
+	.graphdialog button {
+		@apply rounded-md! px-2! text-center! ml-3! hover:bg-[#404040]! bg-[#444444]! transition-colors! cursor-pointer!;
+	}
+
+	.graphdialog input {
+		@apply rounded-md! bg-[#444444]!;
+	}
 }

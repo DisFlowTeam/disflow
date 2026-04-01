@@ -14,7 +14,7 @@ declare module "litegraph.js" {
 export enum ImportType {
     Object, // import { Module } from "mod";
     Default, // import Module from "mod";
-    Everything // import * as Module from "mod";
+    Everything, // import * as Module from "mod";
 }
 
 export interface BaseImportDeclaration {
@@ -28,7 +28,7 @@ export interface BaseImportDeclaration {
 
 export interface ObjectImportDeclaration extends BaseImportDeclaration {
     module: string[];
-    type: ImportType.Object
+    type: ImportType.Object;
 }
 
 export interface ImportDeclaration extends BaseImportDeclaration {
@@ -39,7 +39,7 @@ export interface ImportDeclaration extends BaseImportDeclaration {
 export type AllImportDeclaration = ObjectImportDeclaration | ImportDeclaration;
 export type AllImportDeclarationRaw = AllImportDeclaration & {
     importId: string;
-}
+};
 
 export function constructImportId(statement: AllImportDeclaration) {
     let importId = "";
@@ -66,7 +66,7 @@ export abstract class BaseNode extends LGraphNode {
     constructor() {
         super();
 
-        const childNode = (this.constructor as typeof BaseNode);
+        const childNode = this.constructor as typeof BaseNode;
 
         if (!childNode.noFlows) {
             this.addInput("Exec", FlowIOTypes.Flow);
@@ -86,7 +86,7 @@ export abstract class BaseNode extends LGraphNode {
     addImport(type: AllImportDeclaration) {
         const importId = constructImportId(type);
         Object.assign(type, {
-            importId: importId
+            importId: importId,
         });
         this.imports.add(type as unknown as AllImportDeclarationRaw);
     }
