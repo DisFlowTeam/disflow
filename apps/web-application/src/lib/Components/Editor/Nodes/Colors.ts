@@ -1,4 +1,3 @@
-import { FlowIOTypes } from '@disflow-team/code-gen';
 import { LiteGraph } from 'litegraph.js';
 
 LiteGraph.NODE_TEXT_COLOR = '#FFFFFF';

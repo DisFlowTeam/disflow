@@ -1,6 +1,5 @@
 import { BaseNode, FlowIOTypes, BaseGenerator } from '@disflow-team/code-gen';
 import { NodeCategoryColor } from '../Colors';
-import { LiteGraph } from 'litegraph.js';
 
 export class ReverseText extends BaseNode {
 	static title: string = 'Reverse Text';

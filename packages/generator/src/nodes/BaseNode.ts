@@ -1,4 +1,4 @@
-import { INodeInputSlot, LGraphNode, LiteGraph, INodeOutputSlot, widgetTypes } from "litegraph.js";
+import { INodeInputSlot, LGraphNode, LiteGraph, INodeOutputSlot } from "litegraph.js";
 import { BaseGenerator } from "../Generator";
 import { FlowIOTypes } from "../types";
 

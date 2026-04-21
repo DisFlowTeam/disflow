@@ -1,4 +1,4 @@
-import { BaseGenerator, BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
+import { BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
 
 const controls = {
