@@ -1,11 +1,6 @@
 import { BaseNode, FlowIOTypes } from '@disflow-team/code-gen';
 import { NodeCategoryColor } from '../Colors';
 
-const controls = {
-	true: 'true',
-	false: 'false'
-};
-
 export class Boolean extends BaseNode {
 	static title: string = 'Boolean';
 	static category: string = 'Control';
@@ -23,7 +18,10 @@ export class Boolean extends BaseNode {
 			},
 			{
 				property: 'value',
-				values: Object.keys(controls)
+				values: [
+					"true",
+					"false"
+				]
 			}
 		);
 		this.addOutput('Boolean', FlowIOTypes.Boolean);

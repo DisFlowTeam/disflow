@@ -61,7 +61,6 @@ __metadata:
     "@disflow-team/tsconfig": "workspace:^"
     "@disflow-team/utils": "workspace:^"
     litegraph.js: "npm:^0.7.18"
-    tsup: "npm:^8.5.1"
   languageName: unknown
   linkType: soft
 
