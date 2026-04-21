@@ -70,7 +70,6 @@
 			}
 		);
 		
-		c.frame = 30;
 		c.zoom_modify_alpha = false;
 
 		Object.assign(LGraphCanvas.link_type_colors, flowColors);
@@ -91,7 +90,11 @@
 		class="absolute top-24 right-11 bg-blue-700 rounded-lg p-2"
 		onclick={() => {
 			const c = engine.graphToCode(getGraph());
-			code = hljs.highlight(c.code, { language: 'javascript' }).value;
+
+			const clientCode = "const disflowClient = new DisFlowDJS.Client({ intents: Object.values(DisFlowDJS.GatewayIntentBits) })"
+
+			const finalC = "import * as DisFlowDJS from \"discord.js\";\n" + clientCode + "\n" + c.code;
+			code = hljs.highlight(finalC, { language: 'javascript' }).value;
 			const json = c.meta;
 			pkg = hljs.highlight(json, { language: "json" }).value;
 			dialog.showModal();

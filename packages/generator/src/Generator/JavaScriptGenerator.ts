@@ -213,7 +213,7 @@ export class JavaScriptGenerator extends BaseGenerator {
         this.cleanupCode.clear();
 
         return {
-            code: `${imports}\n\n${initialisers.trimEnd()}\n\n${codeString}\n\n${cleanups}`,
+            code: `${imports}\n\n${initialisers.trimEnd()}\n\n${codeString.join("\n")}\n\n${cleanups}`,
             meta: JSON.stringify({ dependencies: jsonDeps }, null, "\t")
         };
     }

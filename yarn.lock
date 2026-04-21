@@ -20,18 +20,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@disflow-team/data@workspace:packages/data":
-  version: 0.0.0-use.local
-  resolution: "@disflow-team/data@workspace:packages/data"
-  dependencies:
-    "@eslint/js": "npm:^9.39.2"
-    eslint: "npm:^9.39.2"
-    tsup: "npm:^8.5.1"
-    typescript: "npm:^5.9.3"
-    typescript-eslint: "npm:^8.50.0"
-  languageName: unknown
-  linkType: soft
-
 "@disflow-team/tsconfig@workspace:^, @disflow-team/tsconfig@workspace:packages/tsconfig":
   version: 0.0.0-use.local
   resolution: "@disflow-team/tsconfig@workspace:packages/tsconfig"

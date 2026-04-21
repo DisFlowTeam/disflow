@@ -14,7 +14,8 @@ export enum NodeCategoryColor {
     Control = "#3F7FCC",
     Console = "#2FA59A",
     Maths = "#2FBF73",
-    TextTools = "#C97A2B"
+    TextTools = "#C97A2B",
+    Interaction = "#9e8705"
 }
 
 export enum FlowIOColor {
