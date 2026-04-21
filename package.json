@@ -14,12 +14,12 @@
         "build:packages": "turbo build --filter=!web-application"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.2",
-        "eslint": "^9.39.2",
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.1.0",
         "prettier": "^3.7.4",
-        "tsup": "^8.5.1",
+        "tsdown": "^0.21.7",
         "turbo": "^2.6.3",
-        "typescript": "^5.9.3",
+        "typescript": "^6.0.2",
         "typescript-eslint": "^8.50.0"
     },
     "private": true,

@@ -96,7 +96,7 @@
 			const finalC = "import * as DisFlowDJS from \"discord.js\";\n" + clientCode + "\n" + c.code;
 			code = hljs.highlight(finalC, { language: 'javascript' }).value;
 			const json = c.meta;
-			pkg = hljs.highlight(json, { language: "json" }).value;
+			pkg = hljs.highlight(json, { language: 'json' }).value;
 			dialog.showModal();
 		}}>Generate Code</button
 	>

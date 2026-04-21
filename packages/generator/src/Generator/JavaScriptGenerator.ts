@@ -78,9 +78,9 @@ export class JavaScriptGenerator extends BaseGenerator {
                 };
             })
             .filter((v) => v.node && !BaseGenerator.isExecutionPin(v.input.type)) as {
-                node: BaseNode;
-                input: INodeInputSlot;
-            }[];
+            node: BaseNode;
+            input: INodeInputSlot;
+        }[];
     }
 
     // walk down the execution connections
@@ -154,14 +154,14 @@ export class JavaScriptGenerator extends BaseGenerator {
     }
 
     isGhostNode(node: BaseNode) {
-        if(node.isAnyOutputConnected()) return false;
+        if (node.isAnyOutputConnected()) return false;
 
-        for(const input of node.inputs) {
-            if(input.link) return false;
+        for (const input of node.inputs) {
+            if (input.link) return false;
         }
     }
 
-    graphToCode(graph: LGraph): { code: string, meta: string } {
+    graphToCode(graph: LGraph): { code: string; meta: string } {
         let codeString: string[] = [];
 
         // @ts-expect-error need to get all nodes. Could not find any public API to do so (even though there should be one there)
@@ -199,9 +199,9 @@ export class JavaScriptGenerator extends BaseGenerator {
         const initialisers = this.generateInitialiserStatements().join("\n\n");
         const cleanups = this.generateCleanUpStatements().join("\n\n");
 
-        const jsonDeps: Record<string, string> = {}
+        const jsonDeps: Record<string, string> = {};
 
-        for(const dep of this.imports.values().filter(v => !v.isNode)) {
+        for (const dep of this.imports.values().filter((v) => !v.isNode)) {
             jsonDeps[dep.package.split("/")[0]] = dep.version;
         }
 
@@ -221,8 +221,10 @@ export class JavaScriptGenerator extends BaseGenerator {
     // ---------- START IMPORT PROCESSING ----------
     collectImports(node: BaseNode) {
         for (const statement of node.imports) {
-            if(statement.initialiser && !this.initialisers.has(statement.initialiser)) this.initialisers.add(statement.initialiser);
-            if(statement.cleanup && !this.cleanupCode.has(statement.cleanup)) this.cleanupCode.add(statement.cleanup);
+            if (statement.initialiser && !this.initialisers.has(statement.initialiser))
+                this.initialisers.add(statement.initialiser);
+            if (statement.cleanup && !this.cleanupCode.has(statement.cleanup))
+                this.cleanupCode.add(statement.cleanup);
 
             if (statement.type === ImportType.Object) {
                 const modId = `object@${statement.from}`;
@@ -240,7 +242,7 @@ export class JavaScriptGenerator extends BaseGenerator {
                         type: statement.type,
                         version: statement.packageVersion,
                         package: statement.from,
-                        isNode: statement.isFromNodeJS || false
+                        isNode: statement.isFromNodeJS || false,
                     });
                 }
             } else {
@@ -253,7 +255,7 @@ export class JavaScriptGenerator extends BaseGenerator {
                     type: statement.type,
                     version: statement.packageVersion,
                     package: statement.from,
-                    isNode: statement.isFromNodeJS || false
+                    isNode: statement.isFromNodeJS || false,
                 });
             }
         }

@@ -10,19 +10,22 @@
         "@disflow-team/tsconfig": "workspace:^",
         "litegraph.js": "^0.7.18",
         "tsup": "^8.5.1",
-        "typescript": "^5.9.3"
+        "typescript": "^6.0.2"
     },
     "scripts": {
-        "build": "tsup --config ./tsup.config.ts",
+        "build": "tsdown --config ./tsdown.config.ts",
         "lint": "eslint src --ext .ts --fix",
         "prettier": "prettier --write .",
         "prettier:check": "prettier --check ."
     },
     "exports": {
         ".": {
-            "types": "./dist/index.d.ts",
             "import": "./dist/index.mjs",
-            "require": "./dist/index.js"
+            "require": "./dist/index.cjs",
+            "types": {
+                "import": "./dist/index.d.mts",
+                "require": "./dist/index.d.cts"
+            }
         }
     }
 }

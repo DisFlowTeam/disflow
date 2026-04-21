@@ -5,7 +5,7 @@ export const FlowIOTypes = {
     Array: "array",
     Any: "*",
     Boolean: "boolean",
-    Flow: "EXEC_FLOW"
+    Flow: "EXEC_FLOW",
 } as const;
 
 export type FlowIOTypes = (typeof FlowIOTypes)[keyof typeof FlowIOTypes];
