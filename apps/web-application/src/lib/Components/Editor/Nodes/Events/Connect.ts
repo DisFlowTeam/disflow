@@ -14,6 +14,6 @@ export class OnConnect extends RootNode {
     }
 
     nodeToCode(generator: BaseGenerator): string {
-        return `client.on(Events.Ready, () => {\n${generator.statementToCode(this, 0)}\n});`
+        return `client.on(DisFlowDJS.Events.Ready, () => {\n${generator.statementToCode(this, 0)}\n});`
     }
 }
