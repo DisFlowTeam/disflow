@@ -1818,13 +1818,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"devalue@npm:^5.5.0":
-  version: 5.6.1
-  resolution: "devalue@npm:5.6.1"
-  checksum: 10c0/4dca0e800336003fd1e268c142adfe78f3539cda7384b4f69762a93e0dfc33e223b580251da0a6da4be44962958fcba5eadf122f9720e09f437b28904af9c43e
-  languageName: node
-  linkType: hard
-
 "devalue@npm:^5.6.4":
   version: 5.7.1
   resolution: "devalue@npm:5.7.1"
