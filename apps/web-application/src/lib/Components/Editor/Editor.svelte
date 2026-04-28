@@ -40,7 +40,6 @@
 
 	OnProgramStartNode.forEngine(engine);
 	LiteGraph.registerNodeType('Events/Start', OnProgramStartNode);
-
 	for (const Node of Object.values(Nodes)) {
 		Node.forEngine(engine);
 		LiteGraph.registerNodeType(Node.buildReferenceName(), Node);
@@ -48,6 +47,7 @@
 
 	let canvas: HTMLCanvasElement;
 	let dialog: HTMLDialogElement;
+	let viewContainer: HTMLDivElement;
 
 	let flowColors: Record<string, string> = {};
 
@@ -91,13 +91,14 @@
 		onclick={() => {
 			const c = engine.graphToCode(getGraph());
 
-			const clientCode = "const disflowClient = new DisFlowDJS.Client({ intents: Object.values(DisFlowDJS.GatewayIntentBits) })"
+			const clientCode = `const disflowClient = new DisFlowDJS.Client({ intents: ${c.intents} })`
 
 			const finalC = "import * as DisFlowDJS from \"discord.js\";\n" + clientCode + "\n" + c.code;
 			code = hljs.highlight(finalC, { language: 'javascript' }).value;
 			const json = c.meta;
 			pkg = hljs.highlight(json, { language: 'json' }).value;
 			dialog.showModal();
+			viewContainer.scrollIntoView({ behavior: "instant" })
 		}}>Generate Code</button
 	>
 	<canvas bind:this={canvas} class="h-full w-screen"></canvas>
@@ -108,7 +109,7 @@
 	open={false}
 	class="h-[calc(100vh-5rem)] max-w-[100vw] p-3 w-screen absolute top-20 left-0 bg-gray-900"
 >
-	<div class="w-11/12 h-11/12 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">
+	<div bind:this={viewContainer} class="w-11/12 h-11/12 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">
 		<pre><code>{@html code}</code></pre>
 	</div>
 	<div class="w-11/12 h-11/12 mt-5 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">

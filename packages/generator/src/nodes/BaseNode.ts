@@ -62,6 +62,7 @@ export abstract class BaseNode extends LGraphNode {
     indentExec = true;
 
     imports = new Set<AllImportDeclarationRaw>();
+    requiredIntents: string[] = [];
 
     constructor() {
         super();
@@ -128,6 +129,11 @@ export abstract class BaseNode extends LGraphNode {
         }
 
         return true;
+    }
+    
+    addIntent(intent: string) {
+        if(this.requiredIntents.includes(intent)) return;
+        this.requiredIntents.push(intent);
     }
 
     onOutputAdded(output: INodeOutputSlot) {

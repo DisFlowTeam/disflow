@@ -29,6 +29,7 @@ export class JavaScriptGenerator extends BaseGenerator {
     private imports = new Map<string, JavaScriptImport>();
     private initialisers = new Set<string>();
     private cleanupCode = new Set<string>();
+	private intents = new Set<string>();
 
     // walk up the execution connections
     valueToCode(node: BaseNode, inputIndex: number): string {
@@ -161,7 +162,7 @@ export class JavaScriptGenerator extends BaseGenerator {
         }
     }
 
-    graphToCode(graph: LGraph): { code: string; meta: string } {
+    graphToCode(graph: LGraph): { code: string; meta: string, intents: string } {
         let codeString: string[] = [];
 
         // @ts-expect-error need to get all nodes. Could not find any public API to do so (even though there should be one there)
@@ -170,7 +171,10 @@ export class JavaScriptGenerator extends BaseGenerator {
         // filter all the 'roots'
         const roots = nodes.filter((node) => {
             // filter and create import statements at the same time.
-            if (!this.isGhostNode(node)) this.collectImports(node);
+            if (!this.isGhostNode(node)) {
+                this.collectImports(node);
+				this.collectIntents(node);
+            }
             return node instanceof RootNode;
         });
 
@@ -205,18 +209,29 @@ export class JavaScriptGenerator extends BaseGenerator {
             jsonDeps[dep.package.split("/")[0]] = dep.version;
         }
 
+		const intents = JSON.stringify(["Guilds", ...structuredClone(this.intents)]);
+
         // reset all the cache
         this.imports.clear();
         this.visitedNodes.clear();
         this.codeCache.clear();
         this.initialisers.clear();
         this.cleanupCode.clear();
+		this.intents.clear();
 
         return {
             code: `${imports}\n\n${initialisers.trimEnd()}\n\n${codeString.join("\n")}\n\n${cleanups}`,
-            meta: JSON.stringify({ dependencies: jsonDeps }, null, "\t")
+            meta: JSON.stringify({ dependencies: jsonDeps }, null, "\t"),
+			intents: intents
         };
     }
+
+	collectIntents(node: BaseNode) {
+		for (const intent of node.requiredIntents) {
+			if(this.intents.has(intent)) continue;
+			this.intents.add(intent);
+		}
+	}
 
     // ---------- START IMPORT PROCESSING ----------
     collectImports(node: BaseNode) {
