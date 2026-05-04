@@ -1,5 +1,6 @@
 {
     "name": "@disflow-team/code-gen",
+	"version": "1.0.0",
     "description": "A tiny, 0 dependency module to add code generation capabilities to litegraph.js. Used alongside @disflow-team/nodes",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
