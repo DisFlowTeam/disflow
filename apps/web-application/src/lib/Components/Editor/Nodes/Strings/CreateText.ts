@@ -40,7 +40,7 @@ export class CreateText extends BaseNode {
 	}
 
 	nodeToCode(generator: BaseGenerator): string {
-		let A, B;
+		let A: string, B: string;
 
 		if (this.inputs[0].link != null && this.getInputDataType(0) == FlowIOTypes.String) {
 			A = generator.valueToCode(this, 0);

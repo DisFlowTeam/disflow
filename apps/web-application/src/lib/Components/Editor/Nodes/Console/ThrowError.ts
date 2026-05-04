@@ -1,6 +1,5 @@
 import { BaseGenerator, BaseNode, FlowIOTypes } from '@disflow-team/code-gen';
 import { NodeCategoryColor } from '../Colors';
-import type { LLink, INodeOutputSlot, INodeInputSlot } from 'litegraph.js';
 
 export class ThrowError extends BaseNode {
 	static title: string = 'Throw Error';
@@ -16,9 +15,6 @@ export class ThrowError extends BaseNode {
 			'Content',
 			'Your Error',
 			(v: string) => {
-				// if(v.trim() === "") this.addInput("content", FlowIOTypes.Any);
-				// else this.removeInput(1);
-
 				this.properties.content = v;
 			},
 			{
