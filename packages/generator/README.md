@@ -27,6 +27,10 @@ These two are methods that nodes will use to generate code for their branches. T
 - `valueToCode`: Used for any inputs of data. In a tree structure, this walks up to all the nodes connected to the input slot.
 - `statementCode`: Used for execution flow. Useful for control flow nodes. In a tree structure, this walks from the output node down to all the connected nodes.
 
+# Code Generation
+
+Before doing anything, you need to register the node with the respective code generation engine. This can be done using the method `BaseNode.forEngine(<BaseEngine>)`. After registering the nodes, you can call `<BaseGenerator>.graphToCode(litegraphInstance)` to generate your code. This will return an object with the type `{ code: string, meta: string, intents: string }`. It is up to the developer on how they want to implement intents and package requirements with intents being a JSON stringified version of Discord.js' intents.
+
 # Todos
 
 - [ ] Implement `Order` similar to how Blockly does it.

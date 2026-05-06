@@ -74,7 +74,7 @@ The web application will be available at `http://localhost:5173` (default Vite p
 ## Project Structure
 
 - [`apps/web-application/`](apps/web-application/) - SvelteKit frontend application with the visual editor
-- [`packages/generator/`](packages/generator/) - Code generation module that extends litegraph.js capabilities
+- [`packages/generator/`](packages/generator/) - Code generation module that extends litegraph.js capabilities. Please view its [README](packages/generator/README.md) if you would like to develop nodes for DisFlow or adapt the generator into your own litegraph applications
 - [`packages/utils/`](packages/utils/) - Shared utility functions and workspace management tools
 - [`packages/tsconfig/`](packages/tsconfig/) - Shared TypeScript configuration for consistent builds
 
