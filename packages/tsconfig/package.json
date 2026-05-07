@@ -2,7 +2,7 @@
     "name": "@disflow-team/tsconfig",
     "description": "TypeScript configuration for DisFlow packages.",
     "main": "dist/index.cjs",
-	"version": "0.0.1",
+    "version": "0.0.1",
     "scripts": {
         "build": "tsdown"
     },

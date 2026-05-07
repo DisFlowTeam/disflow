@@ -1,6 +1,6 @@
 {
     "name": "@disflow-team/utils",
-	"version": "0.0.1",
+    "version": "0.0.1",
     "description": "A set of utilities used by DisFlow",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
