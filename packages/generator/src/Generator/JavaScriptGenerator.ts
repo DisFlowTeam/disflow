@@ -206,10 +206,19 @@ export class JavaScriptGenerator extends BaseGenerator {
         const jsonDeps: Record<string, string> = {};
 
         for (const dep of this.imports.values().filter((v) => !v.isNode)) {
-            jsonDeps[dep.package.split("/")[0]] = dep.version;
+			if(dep.package.startsWith("@")) {
+				const packageParts = dep.package.split("/");
+				const packageName = packageParts[0] + "/" + packageParts[1];
+				jsonDeps[packageName] = dep.version;
+			} else {
+				jsonDeps[dep.package.split("/")[0]] = dep.version;
+			}
         }
 
-		const intents = JSON.stringify(["Guilds", ...structuredClone(this.intents)]);
+		jsonDeps["discord.js"] = "^14";
+
+		const intentsRaw = ["Guilds", ...structuredClone(this.intents)].map(v => `\tDisflowDJS.GatewayIntentBits.${v}`);
+		const intents = `[\n${intentsRaw.join(",\n")}\n]`
 
         // reset all the cache
         this.imports.clear();
@@ -221,7 +230,12 @@ export class JavaScriptGenerator extends BaseGenerator {
 
         return {
             code: `${imports}\n\n${initialisers.trimEnd()}\n\n${codeString.join("\n")}\n\n${cleanups}`,
-            meta: JSON.stringify({ dependencies: jsonDeps }, null, "\t"),
+            meta: JSON.stringify({
+				name: "disflow-discord-bot",
+				version: "1.0.0",
+				description: "This Discord bot is generated using DisFlow. The no-code Discord bot builder",
+				dependencies: jsonDeps
+			}, null, "\t"),
 			intents: intents
         };
     }
