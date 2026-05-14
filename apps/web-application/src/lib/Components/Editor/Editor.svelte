@@ -6,7 +6,7 @@
 	import javascript from 'highlight.js/lib/languages/javascript';
 	import json from 'highlight.js/lib/languages/json';
 	import 'litegraph.js/css/litegraph.css';
-	import { LGraphCanvas, LiteGraph } from 'litegraph.js';
+	import { type LGraph, LGraphCanvas, LiteGraph } from 'litegraph.js';
 	import { JavaScriptGenerator, OnProgramStartNode } from '@disflow-team/code-gen';
 	import { FlowIOTypes } from '@disflow-team/code-gen';
 	import * as Nodes from './Nodes';
@@ -14,6 +14,12 @@
 	import { NodeCategoryColor } from './Nodes/Colors';
 
 	const originalAddItem = LiteGraph.ContextMenu.prototype.addItem;
+
+	const {
+		initialLoad
+	}: {
+		initialLoad?: ReturnType<LGraph['serialize']>
+	} = $props();
 
 	LiteGraph.ContextMenu.prototype.addItem = function (name, value, options) {
 		const element = originalAddItem.call(this, name, value, options) as HTMLDivElement | undefined;
@@ -74,8 +80,12 @@
 
 		Object.assign(LGraphCanvas.link_type_colors, flowColors);
 
-		// @ts-ignore
-		if (graph._nodes.length === 0) {
+		if (initialLoad) {
+			graph.configure(initialLoad, false);
+		} else if (
+			// @ts-expect-error Graph contains the "private" property _nodes
+			graph._nodes.length === 0
+		) {
 			const node = new OnProgramStartNode();
 
 			node.pos = [canvas.width / 4, canvas.height / 2];
