@@ -20,7 +20,7 @@
         "lint": "eslint src --ext .ts --fix",
         "prettier": "prettier --write .",
         "prettier:check": "prettier --check .",
-        "test": "vitest"
+        "test": "vitest run"
     },
     "exports": {
         ".": {

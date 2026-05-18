@@ -41,7 +41,7 @@ describe("testing crypto operations", async () => {
     it("should not decrypt but throw", async () => {
         const key = await Crypto.keyFromArrayBuffer(crypto.getRandomValues(new Uint8Array(16)).buffer);
 
-        expect(Crypto.decryptData(enc!.enc, enc!.iv, key)).rejects.toThrow();
+        await expect(Crypto.decryptData(enc!.enc, enc!.iv, key)).rejects.toThrow();
     })
 
     it("should exit sudo mode", async () => {
