@@ -22,7 +22,7 @@ export abstract class BaseGenerator {
 
     abstract valueToCode(node: BaseNode, inputIndex: number): string;
     abstract statementToCode(node: BaseNode, inputIndex: number): string;
-    abstract graphToCode(graph: LGraph): { code: string; meta: string, intents: string };
+    abstract graphToCode(graph: LGraph): { code: string; meta: string, intents: string[] };
 
     static isExecutionPin(type: string | number): boolean {
         return (

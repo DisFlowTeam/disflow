@@ -14,17 +14,20 @@ export interface ApplicationSchema {
     }>,
     environment: {
         variables: Map<string, string> // must be an encrypted string
-    }
+    },
+    token: string;
 }
+
+export type ApplicationCreationOptions = Omit<ApplicationSchema, "commands" | "environment" | "data">;
 
 const LOCKS = {
     COMMAND_PROCESSING: "COMMAND",
     ENV: "ENV_VAR"
 } as const;
 
-type LOCKS = (typeof LOCKS)[keyof typeof LOCKS]
+type LOCKS = (typeof LOCKS)[keyof typeof LOCKS];
 
-export type Command = ExtractFromMap<ApplicationSchema['commands']>
+export type Command = ExtractFromMap<ApplicationSchema['commands']>;
 
 type ExtractFromMap<T> = T extends Map<unknown, infer R> ? R : never;
 
@@ -33,12 +36,55 @@ export class Application {
 
     constructor(public schema: ApplicationSchema) { };
 
+    static async get(id: string) {
+        const db = createSingleton();
+        const app = await db.applications.get(id);
+
+        if(!app) return undefined;
+
+        return new Application(app);
+    }
+
+    static async create(options: ApplicationCreationOptions) {
+        const realSchema: ApplicationSchema = {
+            ...options,
+            commands: new Map(),
+            environment: {
+                variables: new Map()
+            },
+            data: compress({})
+        }
+
+        const database = createSingleton();
+        const has = await database.applications.get(realSchema.id);
+        if(has) return {
+            created: false,
+            app: new Application(has)
+        }
+
+        await database.applications.add(realSchema);
+
+        return {
+            created: true,
+            app: new Application(realSchema)
+        }
+    }
+
     get id() {
         return this.schema.id;
     }
 
     get name() {
         return this.schema.name;
+    }
+
+    async changeToken(token: string) {
+        if(!SudoMode.isSudo()) throw new Error("Enter SudoMode first.")
+        const encrypted = await this.encryptString(token);
+
+        this.db.applications.update(this.id, {
+            token: encrypted
+        })
     }
 
     async #grabAppDataOrThrow() {
@@ -133,7 +179,7 @@ export class Application {
         return decoder.decode(data);
     }
 
-    async createVariable(key: string, name: string, value: string) {
+    async createVariable(name: string, value: string) {
         const encryptedString = await this.encryptString(value);
         const appData = await this.#grabAppDataOrThrow();
 
@@ -160,17 +206,14 @@ export class Application {
         })
     }
 
-    async exportVariables(key: string) {
+    async exportVariables() {
         const appData = await this.#grabAppDataOrThrow();
 
         const environmentEnteries = appData.environment.variables.entries();
+        const final = await Promise.all(environmentEnteries.map(async ([k, v]) => {
+            return `${k}=${JSON.stringify(await this.decryptString(v))}`
+        }));
 
-        let finalString = "";
-
-        for (const [k, value] of environmentEnteries) {
-            finalString += k + "=" + + "\"" + JSON.stringify(await this.decryptString(value)) + "\"" + "\n";
-        }
-
-        return finalString.trim();
+        return final.join("\n").trim();
     }
 }

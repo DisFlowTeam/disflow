@@ -162,7 +162,7 @@ export class JavaScriptGenerator extends BaseGenerator {
         }
     }
 
-    graphToCode(graph: LGraph): { code: string; meta: string, intents: string } {
+    graphToCode(graph: LGraph): { code: string; meta: string, intents: string[] } {
         let codeString: string[] = [];
 
         // @ts-expect-error need to get all nodes. Could not find any public API to do so (even though there should be one there)
@@ -217,8 +217,7 @@ export class JavaScriptGenerator extends BaseGenerator {
 
 		jsonDeps["discord.js"] = "^14";
 
-		const intentsRaw = ["Guilds", ...structuredClone(this.intents)].map(v => `\tDisflowDJS.GatewayIntentBits.${v}`);
-		const intents = `[\n${intentsRaw.join(",\n")}\n]`
+		const intents = ["Guilds", ...structuredClone(this.intents)].map(v => `\tDisflowDJS.GatewayIntentBits.${v}`);
 
         // reset all the cache
         this.imports.clear();
@@ -236,7 +235,7 @@ export class JavaScriptGenerator extends BaseGenerator {
 				description: "This Discord bot is generated using DisFlow. The no-code Discord bot builder",
 				dependencies: jsonDeps
 			}, null, "\t"),
-			intents: intents
+			intents
         };
     }
 

@@ -4,36 +4,35 @@ function makeLogMessage(msg: string) {
     return "[DISFLOW CRYPTO]: " + msg;
 }
 
-// Main Crypto API
-export class Crypto {
-    private static async deriveKey(passcode: string, salt: Uint8Array<ArrayBuffer>) {
-        const encoder = new TextEncoder();
+async function deriveKey(passcode: string, salt: Uint8Array<ArrayBuffer>) {
+    const encoder = new TextEncoder();
 
-        const baseKey = await crypto.subtle.importKey(
-            "raw",
-            encoder.encode(passcode),
-            "PBKDF2",
-            false,
-            ['deriveKey']
-        )
+    const baseKey = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(passcode),
+        "PBKDF2",
+        false,
+        ['deriveKey']
+    )
 
-        const key = await crypto.subtle.deriveKey(
-            {
-                name: "PBKDF2",
-                salt,
-                iterations: 10000,
-                hash: "SHA-256"
-            },
-            baseKey,
-            { name: "AES-GCM", length: 256 },
-            false,
-            ["encrypt", "decrypt"]
-        )
+    const key = await crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt,
+            iterations: 10000,
+            hash: "SHA-256"
+        },
+        baseKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+    )
 
-        return key;
-    }
+    return key;
+}
 
-    static keyFromArrayBuffer(buffer: ArrayBuffer) {
+export const Crypto = {
+    keyFromArrayBuffer(buffer: ArrayBuffer) {
         return crypto.subtle.importKey(
             "raw",
             buffer,
@@ -41,9 +40,9 @@ export class Crypto {
             false,
             ['encrypt', 'decrypt']
         )
-    }
+    },
 
-    static async encryptData(data: string | Uint8Array<ArrayBuffer>, key: CryptoKey) {
+    async encryptData(data: string | Uint8Array<ArrayBuffer>, key: CryptoKey) {
         const iv = crypto.getRandomValues(new Uint8Array(12));
         const encoder = new TextEncoder();
 
@@ -58,9 +57,9 @@ export class Crypto {
             ),
             iv
         }
-    }
+    },
 
-    static async decryptData(data: ArrayBuffer, iv: Uint8Array<ArrayBuffer>, key: CryptoKey) {
+    async decryptData(data: ArrayBuffer, iv: Uint8Array<ArrayBuffer>, key: CryptoKey) {
         return crypto.subtle.decrypt(
             {
                 name: "AES-GCM",
@@ -69,9 +68,9 @@ export class Crypto {
             key,
             data
         )
-    }
+    },
 
-    public static pack(enc: Uint8Array, salt: Uint8Array, iv: Uint8Array) {
+    pack(enc: Uint8Array, salt: Uint8Array, iv: Uint8Array) {
         const combined = new Uint8Array(enc.length + salt.length + iv.length);
 
         combined.set(salt, 0);
@@ -79,9 +78,9 @@ export class Crypto {
         combined.set(enc, iv.length + salt.length);
 
         return btoa(String.fromCharCode(...combined));
-    }
+    },
 
-    public static unpack(str: string) {
+    unpack(str: string) {
         const rawString = atob(str);
         const combined = new Uint8Array(rawString.split("").map(v => v.charCodeAt(0)));
 
@@ -94,10 +93,9 @@ export class Crypto {
             iv,
             cipher: cipher
         }
-    }
+    },
 
-    // 6 digit code
-    static async createMasterKey(passcode: string, override = false) {
+    async createMasterKey(passcode: string, override = false) {
         if (passcode.length > 6) throw new Error(makeLogMessage("Passcode must be a 6 digit code."));
 
         console.log(makeLogMessage("Recieved key creation request."));
@@ -107,7 +105,7 @@ export class Crypto {
         if (master && override) console.log(makeLogMessage("Master key override request recieved. Make sure you backed up all your data."))
 
         const salt = crypto.getRandomValues(new Uint8Array(16));
-        const key = await this.deriveKey(passcode, salt);
+        const key = await deriveKey(passcode, salt);
 
         const masterKey = crypto.getRandomValues(new Uint8Array(32));
 
@@ -118,27 +116,29 @@ export class Crypto {
         localStorage.setItem(MASTER_KEY, pack);
 
         return enc;
-    }
+    },
 
-    static async getMasterKey(pin: string) {
+    async getMasterKey(pin: string) {
         const master = localStorage.getItem(MASTER_KEY);
 
-        if(!master) throw new Error(makeLogMessage("Create a master key first."));
+        if (!master) throw new Error(makeLogMessage("Create a master key first."));
 
         const { salt, iv, cipher } = this.unpack(master);
-        const key = await this.deriveKey(pin, salt);
+        const key = await deriveKey(pin, salt);
 
         const masterDecrypted = await this.decryptData(cipher.buffer, iv, key);
 
         return masterDecrypted;
     }
-}
+} as const;
+
+export type Crypto = (typeof Crypto)[keyof typeof Crypto];
 
 export class SudoMode {
     public static masterKey: ArrayBuffer | undefined = undefined;
 
     public static async enterSudo(pin: string) {
-        if(this.masterKey) throw new Error("Already in sudo mode.")
+        if (this.masterKey) throw new Error("Already in sudo mode.")
         try {
             const hasMasterKey = localStorage.getItem(MASTER_KEY);
 
@@ -149,7 +149,7 @@ export class SudoMode {
     }
 
     public static exitSudo() {
-        if(this.masterKey) return this.masterKey = undefined;
+        if (this.masterKey) return this.masterKey = undefined;
         throw new Error("Not in sudo mode.")
     }
 

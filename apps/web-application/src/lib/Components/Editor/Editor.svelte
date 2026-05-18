@@ -101,7 +101,7 @@
 		onclick={() => {
 			const c = engine.graphToCode(getGraph());
 
-			const clientCode = `const disflowClient = new DisFlowDJS.Client({ intents: ${c.intents} })`
+			const clientCode = `const disflowClient = new DisFlowDJS.Client({ intents: [${c.intents.join(", ")}] })`
 
 			const finalC = "import * as DisFlowDJS from \"discord.js\";\n" + clientCode + "\n" + c.code;
 			code = hljs.highlight(finalC, { language: 'javascript' }).value;
