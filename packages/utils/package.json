@@ -9,15 +9,18 @@
     ],
     "devDependencies": {
         "@disflow-team/tsconfig": "workspace:^",
+        "happy-dom": "^20.9.0",
         "litegraph.js": "^0.7.18",
         "tsup": "^8.5.1",
-        "typescript": "^6.0.2"
+        "typescript": "^6.0.2",
+        "vitest": "^4.1.6"
     },
     "scripts": {
         "build": "tsdown --config ./tsdown.config.ts",
         "lint": "eslint src --ext .ts --fix",
         "prettier": "prettier --write .",
-        "prettier:check": "prettier --check ."
+        "prettier:check": "prettier --check .",
+        "test": "vitest"
     },
     "exports": {
         ".": {

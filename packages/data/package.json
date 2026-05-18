@@ -1,0 +1,17 @@
+{
+    "name": "@disflow-team/local-data",
+    "description": "A Dexie wrapper designed to handle Disflow data.",
+    "version": "1.0.0",
+    "scripts": {
+        "build": "tsdown"
+    },
+    "devDependencies": {
+        "@disflow-team/tsconfig": "workspace:^",
+        "tsdown": "0.21.7"
+    },
+    "dependencies": {
+        "@disflow-team/utils": "workspace:^",
+        "compress-json": "^3.4.0",
+        "dexie": "^4.4.2"
+    }
+}
