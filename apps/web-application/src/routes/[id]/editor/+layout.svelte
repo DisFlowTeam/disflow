@@ -5,7 +5,7 @@
 	let { children } = $props();
 </script>
 
-<div class="h-[calc(100vh-5rem)] w-full overflow-hidden">
+<div class="h-full w-full overflow-hidden">
 	<Sidebar.Provider>
 		<AppSidebar />
 		<div>

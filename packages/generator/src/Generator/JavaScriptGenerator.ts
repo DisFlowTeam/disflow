@@ -21,6 +21,9 @@ export interface JavaScriptImport {
     isNode: boolean;
 }
 
+/**
+ * The class for generating JavaScript code
+ */
 export class JavaScriptGenerator extends BaseGenerator {
     private visitedNodes = new Set<number>();
     // Cache for valueToCode since these statements can be somewhat computationally expensive
@@ -31,7 +34,12 @@ export class JavaScriptGenerator extends BaseGenerator {
     private cleanupCode = new Set<string>();
 	private intents = new Set<string>();
 
-    // walk up the execution connections
+    /**
+     * Generate code by walking up the input of a node.
+     * @param node The node you want to start the walk-up from
+     * @param inputIndex The input index of the input you want to walk from
+     * @returns The generated branch
+     */
     valueToCode(node: BaseNode, inputIndex: number): string {
         const iNode = node.getInputNode(inputIndex) as BaseNode | null;
         const iInfo = node.getInputInfo(inputIndex);
@@ -84,7 +92,12 @@ export class JavaScriptGenerator extends BaseGenerator {
         }[];
     }
 
-    // walk down the execution connections
+    /**
+     * Convert all the execution path into code
+     * @param node The node that you want to start from
+     * @param outputIndex The output index of the node you want to start generating from
+     * @returns The generated branch
+     */
     statementToCode(node: BaseNode, outputIndex: number): string {
         let finalCode = "";
         const oNodes = (node.getOutputNodes(outputIndex) as BaseNode[] | null) || [];
@@ -232,7 +245,7 @@ export class JavaScriptGenerator extends BaseGenerator {
             meta: JSON.stringify({
 				name: "disflow-discord-bot",
 				version: "1.0.0",
-				description: "This Discord bot is generated using DisFlow. The no-code Discord bot builder",
+				description: "This Discord bot is generated using DisFlow. The open source, no-code Discord bot builder",
 				dependencies: jsonDeps
 			}, null, "\t"),
 			intents
@@ -318,6 +331,7 @@ export class JavaScriptGenerator extends BaseGenerator {
                     }
                     default: {
                         statement = `import ${v.modules[0]}`;
+                        break;
                     }
                 }
 
