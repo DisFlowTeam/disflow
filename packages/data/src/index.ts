@@ -15,6 +15,11 @@ class ApplicationManager {
     async get(id: string) {
         return Application.get(id);
     }
+
+    async getAll() {
+        const db = createSingleton();
+        return (await db.applications.toArray()).map(v => new Application(v));
+    }
 }
 
 class DisflowDB {
@@ -24,7 +29,7 @@ class DisflowDB {
     constructor() {
         this.db = new Dexie("disflow-data") as DexieWithApps;
         this.db.version(1).stores({
-            applications: "id, name, avatar, commands, environment, token"
+            applications: "id, name, avatar, commands, environment, token, lastModified"
         });
     }
 
@@ -38,3 +43,5 @@ export function createSingleton() {
 
     return db;
 }
+
+export * from "./Schemas/Application";

@@ -2,6 +2,7 @@
     "name": "@disflow-team/local-data",
     "description": "A Dexie wrapper designed to handle Disflow data.",
     "version": "1.0.0",
+    "main": "dist/index.js",
     "scripts": {
         "build": "tsdown"
     },
@@ -13,5 +14,15 @@
         "@disflow-team/utils": "workspace:^",
         "compress-json": "^3.4.0",
         "dexie": "^4.4.2"
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs",
+            "types": {
+                "import": "./dist/index.d.mts",
+                "require": "./dist/index.d.cts"
+            }
+        }
     }
 }

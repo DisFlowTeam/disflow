@@ -115,7 +115,7 @@ export const Crypto = {
 
         localStorage.setItem(MASTER_KEY, pack);
 
-        return enc;
+        return masterKey.buffer;
     },
 
     async getMasterKey(pin: string) {
@@ -143,6 +143,7 @@ export class SudoMode {
             const hasMasterKey = localStorage.getItem(MASTER_KEY);
 
             this.masterKey = hasMasterKey ? await Crypto.getMasterKey(pin) : await Crypto.createMasterKey(pin);
+            return true;
         } catch {
             return false; // password incorrect
         }

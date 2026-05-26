@@ -7,8 +7,19 @@
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import Container from '@lucide/svelte/icons/container';
 	import * as DropdownMenu from '$lib/Components/ui/dropdown-menu';
+	import { resolve } from '$app/paths';
+	import { createSingleton, type Application } from "@disflow-team/local-data"
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 
 	const sidebar = Sidebar.useSidebar();
+
+	let bots = $state<Application[]>([]);
+
+	onMount(() => {
+		const db = createSingleton();
+		db.appManager.getAll().then((v) => bots = v);
+	})
 
 	const sidebarItemsLogic = [
 		{
@@ -37,8 +48,8 @@
 				<Sidebar.Menu>
 					<Sidebar.MenuItem>
 						<Sidebar.MenuButton>
-							{#snippet child({ props }: any)}
-								<a href={'/editor'} {...props}>
+							{#snippet child({ props })}
+								<a href={resolve(`/${page.url.pathname.split("/")[0]}/editor`)} {...props}>
 									<House />
 									General
 								</a>
@@ -50,11 +61,13 @@
 			<Sidebar.GroupContent>
 				<Sidebar.GroupLabel>Application Logic</Sidebar.GroupLabel>
 				<Sidebar.Menu>
-					{#each sidebarItemsLogic as item}
+					{#each sidebarItemsLogic as item, i (i)}
 						<Sidebar.MenuItem>
 							<Sidebar.MenuButton>
-								{#snippet child({ props }: any)}
-									<a href={item.href} {...props}>
+								{#snippet child({ props })}
+									<a href={
+										resolve(item.href as unknown as "/")
+									} {...props}>
 										<item.icon />
 										{item.name}
 									</a>
@@ -70,7 +83,8 @@
 					<Sidebar.MenuItem>
 						<Sidebar.MenuButton>
 							{#snippet child({ props })}
-								<a href="/editor/environment" {...props}>
+								<!-- TODO: Add routes to environment -->
+								<a href={resolve(`/${page.url.pathname.split("/")[0]}/editor`)} {...props}>
 									<Container />
 									Variables
 								</a>
@@ -96,12 +110,11 @@
 								{/snippet}
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Content class="w-(--bits-dropdown-menu-anchor-width)">
-								<DropdownMenu.Item>
-									<a href="/84714893910243192/editor"><span>My Bot 1</span></a>
-								</DropdownMenu.Item>
-								<DropdownMenu.Item>
-									<a href="/38148931724897389/editor"><span>My Bot 2</span></a>
-								</DropdownMenu.Item>
+								{#each bots as bot, i (i)}
+									<DropdownMenu.Item>
+										<a href={resolve(`/${bot.id}/editor`)}>{bot.name}</a>
+									</DropdownMenu.Item>
+								{/each}
 							</DropdownMenu.Content>
 						</DropdownMenu.Root>
 					</Sidebar.MenuItem>

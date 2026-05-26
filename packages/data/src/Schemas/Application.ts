@@ -16,9 +16,10 @@ export interface ApplicationSchema {
         variables: Map<string, string> // must be an encrypted string
     },
     token: string;
+    lastModified: Date;
 }
 
-export type ApplicationCreationOptions = Omit<ApplicationSchema, "commands" | "environment" | "data">;
+export type ApplicationCreationOptions = Omit<ApplicationSchema, "commands" | "environment" | "data" | "lastModified">;
 
 const LOCKS = {
     COMMAND_PROCESSING: "COMMAND",
@@ -46,13 +47,19 @@ export class Application {
     }
 
     static async create(options: ApplicationCreationOptions) {
+		if(!SudoMode.isSudo()) throw new Error("Must be in Sudo mode");
+
+        const encryptedToken = await this.encryptString(options.token);
+        options.token = encryptedToken;
+
         const realSchema: ApplicationSchema = {
             ...options,
             commands: new Map(),
             environment: {
                 variables: new Map()
             },
-            data: compress({})
+            data: compress({}),
+            lastModified: new Date()
         }
 
         const database = createSingleton();
@@ -80,7 +87,7 @@ export class Application {
 
     async changeToken(token: string) {
         if(!SudoMode.isSudo()) throw new Error("Enter SudoMode first.")
-        const encrypted = await this.encryptString(token);
+        const encrypted = await Application.encryptString(token);
 
         this.db.applications.update(this.id, {
             token: encrypted
@@ -159,7 +166,7 @@ export class Application {
     }
 
     // environment variables
-    async encryptString(value: string) {
+    static async encryptString(value: string) {
         if(!SudoMode.isSudo()) throw new Error("Not in sudo mode. Please enter it first.")
 
         const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -168,7 +175,7 @@ export class Application {
         return Crypto.pack(new Uint8Array(encData.enc), salt, encData.iv);
     }
 
-    async decryptString(encrypted: string) {
+    static async decryptString(encrypted: string) {
         if(!SudoMode.isSudo()) throw new Error("Not in sudo mode. Please enter it first.")
         
         const unpacked = Crypto.unpack(encrypted);
@@ -180,7 +187,7 @@ export class Application {
     }
 
     async createVariable(name: string, value: string) {
-        const encryptedString = await this.encryptString(value);
+        const encryptedString = await Application.encryptString(value);
         const appData = await this.#grabAppDataOrThrow();
 
         navigator.locks.request(LOCKS.ENV, async () => {
@@ -211,7 +218,7 @@ export class Application {
 
         const environmentEnteries = appData.environment.variables.entries();
         const final = await Promise.all(environmentEnteries.map(async ([k, v]) => {
-            return `${k}=${JSON.stringify(await this.decryptString(v))}`
+            return `${k}=${JSON.stringify(await Application.decryptString(v))}`
         }));
 
         return final.join("\n").trim();

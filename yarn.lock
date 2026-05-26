@@ -64,7 +64,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@disflow-team/local-data@workspace:packages/data":
+"@disflow-team/local-data@workspace:^, @disflow-team/local-data@workspace:packages/data":
   version: 0.0.0-use.local
   resolution: "@disflow-team/local-data@workspace:packages/data"
   dependencies:
@@ -711,12 +711,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lucide/svelte@npm:^1.14.0":
-  version: 1.14.0
-  resolution: "@lucide/svelte@npm:1.14.0"
+"@lucide/svelte@npm:^1.16.0":
+  version: 1.16.0
+  resolution: "@lucide/svelte@npm:1.16.0"
   peerDependencies:
     svelte: ^5
-  checksum: 10c0/0b1899fee13eaa2060f5e56bfee50cb2da4e27ad8cf35136fff724ea05550241c25d6c2ad99fc79d97c0fbcc58373d60f4e5285fb3391420f79f6ee7569241eb
+  checksum: 10c0/afaa7be91ff7749bc4936c6ee7f055cf32118d9a7097a9088b2673368317d51b888f1e3ff3a11722462f325b8745ccf9835aa23401262e3fb53139770086e5fc
   languageName: node
   linkType: hard
 
@@ -5442,12 +5442,13 @@ __metadata:
   resolution: "web-application@workspace:apps/web-application"
   dependencies:
     "@disflow-team/code-gen": "workspace:^"
+    "@disflow-team/local-data": "workspace:^"
     "@disflow-team/utils": "workspace:^"
     "@eslint/compat": "npm:^2.0.0"
     "@eslint/js": "npm:^9.39.2"
     "@fontsource-variable/inter": "npm:^5.2.8"
     "@internationalized/date": "npm:^3.12.0"
-    "@lucide/svelte": "npm:^1.14.0"
+    "@lucide/svelte": "npm:^1.16.0"
     "@sveltejs/adapter-auto": "npm:^7.0.0"
     "@sveltejs/kit": "npm:^2.57.1"
     "@sveltejs/vite-plugin-svelte": "npm:^6.2.1"
