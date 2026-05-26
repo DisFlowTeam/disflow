@@ -20,6 +20,15 @@ class ApplicationManager {
         const db = createSingleton();
         return (await db.applications.toArray()).map(v => new Application(v));
     }
+
+    async delete(id: string) {
+        const db = createSingleton();
+        if(await db.applications.get(id)) {
+            await db.applications.delete(id);
+            return true;
+        }
+        return false;
+    }
 }
 
 class DisflowDB {

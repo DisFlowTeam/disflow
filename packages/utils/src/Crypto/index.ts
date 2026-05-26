@@ -91,7 +91,7 @@ export const Crypto = {
         return {
             salt,
             iv,
-            cipher: cipher
+            cipher
         }
     },
 
