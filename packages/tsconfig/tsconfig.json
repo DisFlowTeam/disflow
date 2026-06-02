@@ -1,12 +1,12 @@
 {
-    "compilerOptions": {
-        "target": "ESNext",
-        "module": "commonjs",
-        "declaration": true,
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "strict": true,
-        "skipLibCheck": true,
-        "esModuleInterop": true
-    }
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "commonjs",
+		"declaration": true,
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"strict": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true
+	}
 }

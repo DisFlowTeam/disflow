@@ -1,8 +1,8 @@
 <script lang="ts">
-	import AppSidebar from '$lib/Components/AppSidebar.svelte';
-	import * as Sidebar from '$lib/Components/ui/sidebar';
+import AppSidebar from "$lib/Components/AppSidebar.svelte";
+import * as Sidebar from "$lib/Components/ui/sidebar";
 
-	let { children } = $props();
+let { children } = $props();
 </script>
 
 <div class="h-full w-full overflow-hidden">

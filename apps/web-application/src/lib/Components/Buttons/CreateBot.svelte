@@ -1,101 +1,106 @@
 <script lang="ts">
-	import * as Dialog from '../ui/dialog';
-	import { buttonVariants, Button } from '$lib/Components/ui/button';
-	import Label from '$lib/Components/ui/label/label.svelte';
-	import Input from '$lib/Components/ui/input/input.svelte';
-	import * as InputOTP from '$lib/Components/ui/input-otp';
-	import { createSingleton } from '@disflow-team/local-data';
-	import { SudoMode } from '@disflow-team/utils';
-	import { onMount } from 'svelte';
+import { createSingleton } from "@disflow-team/local-data";
+import { SudoMode } from "@disflow-team/utils";
+import { onMount } from "svelte";
+import { Button, buttonVariants } from "$lib/Components/ui/button";
+import Input from "$lib/Components/ui/input/input.svelte";
+import * as InputOTP from "$lib/Components/ui/input-otp";
+import Label from "$lib/Components/ui/label/label.svelte";
+import * as Dialog from "../ui/dialog";
 
-	interface BotData {
-		avatar?: string;
-		username: string;
-		id: string;
-	}
+interface BotData {
+	avatar?: string;
+	username: string;
+	id: string;
+}
 
-	const { refresh }: {
-		refresh: () => unknown;
-	} = $props();
+const {
+	refresh,
+}: {
+	refresh: () => unknown;
+} = $props();
 
-	let isOpen = $state(false);
-	let token = $state<string>('');
-	let description = $state<string>('');
-	let data = $state<BotData | undefined>(undefined);
-	let loading = $state(false);
+let isOpen = $state(false);
+let token = $state<string>("");
+let description = $state<string>("");
+let data = $state<BotData | undefined>(undefined);
+let loading = $state(false);
 
-	let tokenSaved = $state<string>();
-	let otp = $state<string>('');
+let tokenSaved = $state<string>();
+let otp = $state<string>("");
 
-	let creationState = $state<'new' | 'confirm' | 'digits' | 'error'>('new');
+let creationState = $state<"new" | "confirm" | "digits" | "error">("new");
 
-	onMount(() => {
-		const db = createSingleton();
-		db.appManager.getAll().then(console.log);
-	})
+onMount(() => {
+	const db = createSingleton();
+	db.appManager.getAll().then(console.log);
+});
 
-	async function handleFinalCreate() {
-		if (!data || !tokenSaved || !otp) return;
-		const db = createSingleton();
-        loading = true;
-		if (!SudoMode.isSudo()) {
-			const success = await SudoMode.enterSudo(otp);
-			if (!success) {
-                loading = false;
-                creationState = 'error';
-                return;
-            }
-		}
-
-        if(await db.appManager.get(data.id)) {
-            creationState = "error";
-            loading = false;
-            return;
-        }
-
-		await db.appManager.create({
-			id: data.id,
-			name: data.username,
-			token: tokenSaved,
-			avatar: data.avatar
-		});
-
-		creationState = "new";
-		isOpen = false;
-
-        loading = false;
-
-		refresh();
-	}
-
-	async function handleCreate() {
-		if (!token) return;
-
-		loading = true;
-		const botData = await fetch('/api/bot/info', {
-			headers: {
-				'X-Discord-Token': token
-			}
-		});
-		loading = false;
-
-		tokenSaved = structuredClone($state.snapshot(token));
-
-		if (!botData.ok) {
-			creationState = 'error';
+async function handleFinalCreate() {
+	if (!data || !tokenSaved || !otp) return;
+	const db = createSingleton();
+	loading = true;
+	if (!SudoMode.isSudo()) {
+		const success = await SudoMode.enterSudo(otp);
+		if (!success) {
+			loading = false;
+			creationState = "error";
 			return;
 		}
-
-		data = (await botData.json()) as BotData;
-
-		creationState = 'confirm';
 	}
+
+	if (await db.appManager.get(data.id)) {
+		creationState = "error";
+		loading = false;
+		return;
+	}
+
+	await db.appManager.create({
+		id: data.id,
+		name: data.username,
+		token: tokenSaved,
+		avatar: data.avatar,
+	});
+
+	creationState = "new";
+	isOpen = false;
+
+	loading = false;
+
+	refresh();
+}
+
+async function handleCreate() {
+	if (!token) return;
+
+	loading = true;
+	const botData = await fetch("/api/bot/info", {
+		headers: {
+			"X-Discord-Token": token,
+		},
+	});
+	loading = false;
+
+	tokenSaved = structuredClone($state.snapshot(token));
+
+	if (!botData.ok) {
+		creationState = "error";
+		return;
+	}
+
+	data = (await botData.json()) as BotData;
+
+	creationState = "confirm";
+}
 </script>
 
 <Dialog.Root
 	bind:open={isOpen}
 	onOpenChange={(o) => {
-		if(loading) return isOpen = true; 
+		if(loading) {
+			isOpen = true;
+			return;
+		}; 
 		if (o === false) {
 			console.log(o);
 			creationState = 'new';
@@ -153,7 +158,7 @@
 				<div>
 					<img
 						src={data.avatar || '/DISFLOW_ICO.png'}
-						alt={data.username + "'s avatar"}
+						alt={`${data.username}'s avatar`}
 						class="rounded-full w-36 h-36 mx-auto"
 					/>
 					<p class="text-center mt-3 text-2xl">{data.username}</p>
@@ -163,7 +168,10 @@
 						>Cancel</Dialog.Close
 					>
 					<Button type="button" variant="outline" disabled={loading} onclick={async () => {
-                        if(!SudoMode.isSudo()) return creationState = 'digits';
+                        if(!SudoMode.isSudo()) {
+							creationState = 'digits';
+							return;
+						}
                         await handleFinalCreate()
                     }}
 						>Confirm</Button
@@ -177,15 +185,15 @@
 					>
 				</Dialog.Header>
 				<InputOTP.Root maxlength={6} class="justify-center" bind:value={otp}>
-					{#snippet children({ cells })}
+					{#snippet children({ cells: _cells })}
 						<InputOTP.Group>
-							{#each cells.slice(0, 3) as cell (cell)}
+							{#each _cells.slice(0, 3) as cell (cell)}
 								<InputOTP.Slot {cell} />
 							{/each}
 						</InputOTP.Group>
 						<InputOTP.Separator />
 						<InputOTP.Group>
-							{#each cells.slice(3, 6) as cell (cell)}
+							{#each _cells.slice(3, 6) as cell (cell)}
 								<InputOTP.Slot {cell} />
 							{/each}
 						</InputOTP.Group>

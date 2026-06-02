@@ -1,43 +1,43 @@
 <script lang="ts">
-	import * as Sidebar from '$lib/Components/ui/sidebar';
-	import House from '@lucide/svelte/icons/house';
-	import Bot from '@lucide/svelte/icons/bot';
-	import Command from '@lucide/svelte/icons/command';
-	import FileTerminal from '@lucide/svelte/icons/file-terminal';
-	import ChevronUp from '@lucide/svelte/icons/chevron-up';
-	import Container from '@lucide/svelte/icons/container';
-	import * as DropdownMenu from '$lib/Components/ui/dropdown-menu';
-	import { resolve } from '$app/paths';
-	import { createSingleton, type Application } from "@disflow-team/local-data"
-	import { onMount } from 'svelte';
-	import { page } from '$app/state';
+import { type Application, createSingleton } from "@disflow-team/local-data";
+import Bot from "@lucide/svelte/icons/bot";
+import ChevronUp from "@lucide/svelte/icons/chevron-up";
+import Command from "@lucide/svelte/icons/command";
+import Container from "@lucide/svelte/icons/container";
+import FileTerminal from "@lucide/svelte/icons/file-terminal";
+import House from "@lucide/svelte/icons/house";
+import { onMount } from "svelte";
+import { resolve } from "$app/paths";
+import { page } from "$app/state";
+import * as DropdownMenu from "$lib/Components/ui/dropdown-menu";
+import * as Sidebar from "$lib/Components/ui/sidebar";
 
-	const sidebar = Sidebar.useSidebar();
+const sidebar = Sidebar.useSidebar();
 
-	let bots = $state<Application[]>([]);
+let bots = $state<Application[]>([]);
 
-	onMount(() => {
-		const db = createSingleton();
-		db.appManager.getAll().then((v) => bots = v);
-	})
+onMount(() => {
+	const db = createSingleton();
+	db.appManager.getAll().then((v) => (bots = v));
+});
 
-	const sidebarItemsLogic = [
-		{
-			name: 'Main file',
-			icon: Bot,
-			href: '/editor/bot'
-		},
-		{
-			name: 'Commands',
-			icon: Command,
-			href: '/editor/bot/commands'
-		},
-		{
-			name: 'Events',
-			icon: FileTerminal,
-			href: '/editor/bot/events'
-		}
-	];
+const sidebarItemsLogic = [
+	{
+		name: "Main file",
+		icon: Bot,
+		href: "/editor/bot",
+	},
+	{
+		name: "Commands",
+		icon: Command,
+		href: "/editor/bot/commands",
+	},
+	{
+		name: "Events",
+		icon: FileTerminal,
+		href: "/editor/bot/events",
+	},
+];
 </script>
 
 <Sidebar.Root class="h-[calc(100vh-5rem)] top-20" collapsible="icon">
@@ -48,8 +48,9 @@
 				<Sidebar.Menu>
 					<Sidebar.MenuItem>
 						<Sidebar.MenuButton>
-							{#snippet child({ props })}
-								<a href={resolve(`/${page.url.pathname.split("/")[0]}/editor`)} {...props}>
+							<!-- Weird biome sveltekit support -->
+							{#snippet child({ props: _props })}
+								<a href={resolve(`/${page.url.pathname.split("/")[0]}/editor`)} {..._props}>
 									<House />
 									General
 								</a>
@@ -64,10 +65,10 @@
 					{#each sidebarItemsLogic as item, i (i)}
 						<Sidebar.MenuItem>
 							<Sidebar.MenuButton>
-								{#snippet child({ props })}
+								{#snippet child({ props: _props })}
 									<a href={
 										resolve(item.href as unknown as "/")
-									} {...props}>
+									} {..._props}>
 										<item.icon />
 										{item.name}
 									</a>
@@ -82,9 +83,9 @@
 				<Sidebar.Menu>
 					<Sidebar.MenuItem>
 						<Sidebar.MenuButton>
-							{#snippet child({ props })}
+							{#snippet child({ props: _props })}
 								<!-- TODO: Add routes to environment -->
-								<a href={resolve(`/${page.url.pathname.split("/")[0]}/editor`)} {...props}>
+								<a href={resolve(`/${page.url.pathname.split("/")[0]}/editor`)} {..._props}>
 									<Container />
 									Variables
 								</a>
@@ -102,8 +103,8 @@
 					<Sidebar.MenuItem>
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger>
-								{#snippet child({ props })}
-									<Sidebar.MenuButton {...props}>
+								{#snippet child({ props: _props })}
+									<Sidebar.MenuButton {..._props}>
 										Select Application
 										<ChevronUp class="ms-auto" />
 									</Sidebar.MenuButton>

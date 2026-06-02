@@ -1,13 +1,14 @@
 {
-    "$schema": "https://turborepo.com/schema.json",
-    "tasks": {
-        "build": {
-            "outputs": ["dist/**", ".svelte-kit/**"]
-        },
-        "dev": {},
-        "test": {},
-        "lint": {},
-        "prettier": {},
-        "prettier:check": {}
-    }
+	"$schema": "https://turborepo.com/schema.json",
+	"tasks": {
+		"build": {
+			"outputs": ["dist/**", ".svelte-kit/**"]
+		},
+		"dev": {},
+		"test": {},
+		"//#format-and-lint": {},
+		"//$format-and-lint:fix": {
+			"cache": false
+		}
+	}
 }

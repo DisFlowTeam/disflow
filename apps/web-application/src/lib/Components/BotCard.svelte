@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
-	import { onMount } from 'svelte';
+import { onMount } from "svelte";
+import { resolve } from "$app/paths";
 
-	const {
-		username,
-		avatar,
-		description,
-		lastModified,
-		id
-	}: {
-		username: string;
-		avatar: string;
-		description?: string;
-		lastModified: Date;
-		id: string;
-	} = $props();
+const {
+	username,
+	avatar,
+	description,
+	lastModified,
+	id,
+}: {
+	username: string;
+	avatar: string;
+	description?: string;
+	lastModified: Date;
+	id: string;
+} = $props();
 
-	let text: string = $state('');
+let text: string = $state("");
 
-	onMount(() => {
-		text = `${lastModified.getDate()}/${lastModified.getMonth()}/${lastModified.getFullYear()}`;
-	});
+onMount(() => {
+	text = `${lastModified.getDate()}/${lastModified.getMonth()}/${lastModified.getFullYear()}`;
+});
 </script>
 
 <a href={resolve(`/${id}/editor`)}>

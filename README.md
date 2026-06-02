@@ -85,8 +85,8 @@ The web application will be available at `http://localhost:5173` (default Vite p
 - `yarn build` - Build all packages and applications
 - `yarn dev` - Start development mode (builds packages and starts web app)
 - `yarn test` - Run tests across all workspaces
-- `yarn lint` - Lint all code
-- `yarn prettier` - Format code with Prettier
+- `yarn format-and-lint` - Run biome to check files for formatting and linting errors
+- `yarn format-and-lint:fix` - Run biome to check *and fix* formatting and linting errors when it can
 
 ### Building Packages
 

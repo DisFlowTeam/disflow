@@ -1,28 +1,28 @@
 <script lang="ts">
-	import Code from '@lucide/svelte/icons/chevrons-left-right-ellipsis';
-	import Rocket from '@lucide/svelte/icons/rocket';
-	import Bot from '@lucide/svelte/icons/bot';
-	import BotCard from '$lib/Components/BotCard.svelte';
-	import { onMount, type ComponentProps } from 'svelte';
-	import CreateBot from '$lib/Components/Buttons/CreateBot.svelte';
-	import { createSingleton } from '@disflow-team/local-data';
+import { createSingleton } from "@disflow-team/local-data";
+import Bot from "@lucide/svelte/icons/bot";
+import Code from "@lucide/svelte/icons/chevrons-left-right-ellipsis";
+import Rocket from "@lucide/svelte/icons/rocket";
+import { type ComponentProps, onMount } from "svelte";
+import type BotCard from "$lib/Components/BotCard.svelte";
+import CreateBot from "$lib/Components/Buttons/CreateBot.svelte";
 
-	let items: ComponentProps<typeof BotCard>[] = $state([]);
+let items: ComponentProps<typeof BotCard>[] = $state([]);
 
-	async function refreshItems() {
-		const db = createSingleton();
-		items = (await db.appManager.getAll()).map(v => ({
-			avatar: v.schema.avatar || "./DISFLOW_ICO.png",
-			id: v.id,
-			username: v.name,
-			lastModified: v.schema.lastModified,
-			description: 'A DisFlow bot',
-		}))
-	}
+async function refreshItems() {
+	const db = createSingleton();
+	items = (await db.appManager.getAll()).map((v) => ({
+		avatar: v.schema.avatar || "./DISFLOW_ICO.png",
+		id: v.id,
+		username: v.name,
+		lastModified: v.schema.lastModified,
+		description: "A DisFlow bot",
+	}));
+}
 
-	onMount(() => {
-		void refreshItems()
-	})
+onMount(() => {
+	void refreshItems();
+});
 </script>
 
 <div class="w-full h-full">
