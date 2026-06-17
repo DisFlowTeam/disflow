@@ -1,99 +1,114 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { createEditor, getGraph } from '@disflow-team/utils';
-	import hljs from 'highlight.js';
-	import 'highlight.js/styles/vs.css';
-	import javascript from 'highlight.js/lib/languages/javascript';
-	import json from 'highlight.js/lib/languages/json';
-	import 'litegraph.js/css/litegraph.css';
-	import { LGraphCanvas, LiteGraph } from 'litegraph.js';
-	import { JavaScriptGenerator, OnProgramStartNode } from '@disflow-team/code-gen';
-	import { FlowIOTypes } from '@disflow-team/code-gen';
-	import * as Nodes from './Nodes';
-	import { FlowIOColor } from './Nodes/Colors';
-	import { NodeCategoryColor } from './Nodes/Colors';
+import { createEditor, getGraph } from "@disflow-team/utils";
+import hljs from "highlight.js";
+import { onMount } from "svelte";
+import "highlight.js/styles/vs.css";
+import javascript from "highlight.js/lib/languages/javascript";
+import json from "highlight.js/lib/languages/json";
+import "litegraph.js/css/litegraph.css";
+import {
+	FlowIOTypes,
+	JavaScriptGenerator,
+	OnProgramStartNode,
+} from "@disflow-team/code-gen";
+import { type LGraph, LGraphCanvas, LiteGraph } from "litegraph.js";
+import * as Nodes from "./Nodes";
+import { FlowIOColor, NodeCategoryColor } from "./Nodes/Colors";
 
-	const originalAddItem = LiteGraph.ContextMenu.prototype.addItem;
+const originalAddItem = LiteGraph.ContextMenu.prototype.addItem;
 
-	LiteGraph.ContextMenu.prototype.addItem = function (name, value, options) {
-		const element = originalAddItem.call(this, name, value, options) as HTMLDivElement | undefined;
+const {
+	initialLoad,
+}: {
+	initialLoad?: ReturnType<LGraph["serialize"]>;
+} = $props();
 
-		if (element && element.classList.contains('has_submenu')) {
-			const key = name.replaceAll(' ', '');
-			if (key in NodeCategoryColor) {
-				const color = NodeCategoryColor[key as keyof typeof NodeCategoryColor];
-				element.style.borderRightColor = color;
-			}
+LiteGraph.ContextMenu.prototype.addItem = function (name, value, options) {
+	const element = originalAddItem.call(this, name, value, options) as
+		| HTMLDivElement
+		| undefined;
+
+	if (element?.classList.contains("has_submenu")) {
+		const key = name.replaceAll(" ", "");
+		if (key in NodeCategoryColor) {
+			const color = NodeCategoryColor[key as keyof typeof NodeCategoryColor];
+			element.style.borderRightColor = color;
 		}
-
-		return element;
-	};
-
-	let code = $state('');
-	let pkg = $state('');
-
-	LiteGraph.clearRegisteredTypes();
-	hljs.registerLanguage('javascript', javascript);
-	hljs.registerLanguage('json', json);
-
-	const engine = new JavaScriptGenerator();
-
-	OnProgramStartNode.forEngine(engine);
-	LiteGraph.registerNodeType('Events/Start', OnProgramStartNode);
-	for (const Node of Object.values(Nodes)) {
-		Node.forEngine(engine);
-		LiteGraph.registerNodeType(Node.buildReferenceName(), Node);
 	}
 
-	let canvas: HTMLCanvasElement;
-	let dialog: HTMLDialogElement;
-	let viewContainer: HTMLDivElement;
+	return element;
+};
 
-	let flowColors: Record<string, string> = {};
+let code = $state("");
+let pkg = $state("");
 
-	const flowValues = Object.values(FlowIOTypes);
-	Object.keys(FlowIOTypes).forEach((v, i) => {
-		// @ts-expect-error
-		flowColors[flowValues[i]] = FlowIOColor[v];
-	});
+LiteGraph.clearRegisteredTypes();
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("json", json);
 
-	onMount(() => {
-		const rect = canvas.getBoundingClientRect();
-		canvas.width = rect.width;
-		canvas.height = rect.height;
+const engine = new JavaScriptGenerator();
 
-		const { graph, canvas: c } = createEditor(
-			canvas,
-			{},
-			{
-				autoresize: false
-			}
-		);
-		
-		c.zoom_modify_alpha = false;
+OnProgramStartNode.forEngine(engine);
+LiteGraph.registerNodeType("Events/Start", OnProgramStartNode);
+for (const Node of Object.values(Nodes)) {
+	Node.forEngine(engine);
+	LiteGraph.registerNodeType(Node.buildReferenceName(), Node);
+}
 
-		Object.assign(LGraphCanvas.link_type_colors, flowColors);
+let canvas: HTMLCanvasElement;
+let dialog: HTMLDialogElement;
+let viewContainer: HTMLDivElement;
 
-		// @ts-ignore
-		if (graph._nodes.length === 0) {
-			const node = new OnProgramStartNode();
+let flowColors: Record<string, string> = {};
 
-			node.pos = [canvas.width / 4, canvas.height / 2];
+const flowValues = Object.values(FlowIOTypes);
+Object.keys(FlowIOTypes).forEach((v, i) => {
+	// @ts-expect-error
+	flowColors[flowValues[i]] = FlowIOColor[v];
+});
 
-			graph.add(node);
-		}
-	});
+onMount(() => {
+	const rect = canvas.getBoundingClientRect();
+	canvas.width = rect.width;
+	canvas.height = rect.height;
+
+	const { graph, canvas: c } = createEditor(
+		canvas,
+		{},
+		{
+			autoresize: false,
+		},
+	);
+
+	c.zoom_modify_alpha = false;
+
+	Object.assign(LGraphCanvas.link_type_colors, flowColors);
+
+	if (initialLoad) {
+		graph.configure(initialLoad, false);
+	} else if (
+		// @ts-expect-error Graph contains the "private" property _nodes
+		graph._nodes.length === 0
+	) {
+		const node = new OnProgramStartNode();
+
+		node.pos = [canvas.width / 4, canvas.height / 2];
+
+		graph.add(node);
+	}
+});
 </script>
 
 <div class="flex h-[calc(100vh-5rem)] w-screen">
 	<button
+		type="button"
 		class="absolute top-24 right-11 bg-blue-700 rounded-lg p-2"
 		onclick={() => {
 			const c = engine.graphToCode(getGraph());
 
-			const clientCode = `const disflowClient = new DisFlowDJS.Client({ intents: ${c.intents} })`
+			const clientCode = `const disflowClient = new DisFlowDJS.Client({ intents: [${c.intents.join(", ")}] })`
 
-			const finalC = "import * as DisFlowDJS from \"discord.js\";\n" + clientCode + "\n" + c.code;
+			const finalC = `import * as DisFlowDJS from "discord.js";\n${clientCode}\n${c.code}`;
 			code = hljs.highlight(finalC, { language: 'javascript' }).value;
 			const json = c.meta;
 			pkg = hljs.highlight(json, { language: 'json' }).value;
@@ -117,6 +132,7 @@
 	</div>
 	<div class="w-11/12 h-1/12 mx-auto flex items-center">
 		<button
+			type="button"
 			class="bg-blue-700 py-2 px-6 rounded-md"
 			onclick={() => {
 				dialog.close();
