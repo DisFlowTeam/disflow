@@ -13,3 +13,11 @@ Usage of AI to generate code is strictly forbidden for **new** contributors. If 
 AIs can be used to analyze the the codebase in order for first time contributors to get familiar with the repository. These cases are (but not limited to): explaining how the code generation algorithm works; how DisFlow stores data; the file structure; and technology stack used. However, there are exceptions to this rule. Particularly sensitive pieces of code such as the cryptography module from `@disflow-team/utils` (due to the sensitive nature of data security in local first stores) and the code generators in `@disflow-team/code-gen` (as it could hinder perfomance and introduce hard-to-debug bugs).
 
 You may also use AIs if you are an existing contributor, granted you have read the generated code and tested it.
+
+## Paths to look for
+
+- Each package in `packages` have a readme. Put these in your context before proceeding further
+- Code generator logic: `packages/generator`
+- Existing nodes: `apps/web-application/src/lib/Components/Editor/Nodes`
+    - Each node is exported from `index.js` from their folders and `index.js` at the root
+    - Each node is loaded in `Editor.svelte`
