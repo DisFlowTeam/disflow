@@ -102,11 +102,11 @@ export abstract class BaseNode extends LGraphNode {
 	}
 
 	static buildReferenceName() {
-		return `${BaseNode.category}/${BaseNode.title}`;
+		return `${this.category}/${this.title}`;
 	}
 
 	static forEngine(engine: BaseGenerator) {
-		engine.nodes.set(BaseNode.buildReferenceName(), (node, gen) => {
+		engine.nodes.set(this.buildReferenceName(), (node, gen) => {
 			return node.nodeToCode(gen);
 		});
 	}
