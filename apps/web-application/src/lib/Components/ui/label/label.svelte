@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Label as LabelPrimitive } from "bits-ui";
+import { Label as LabelPrimitive } from "bits-ui";
 import { cn } from "$lib/utils.js";
 
 let {

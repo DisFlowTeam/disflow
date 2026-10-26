@@ -11,6 +11,7 @@ import { resolve } from "$app/paths";
 import { page } from "$app/state";
 import * as DropdownMenu from "$lib/Components/ui/dropdown-menu";
 import * as Sidebar from "$lib/Components/ui/sidebar";
+	import { redirect } from "@sveltejs/kit";
 
 const sidebar = Sidebar.useSidebar();
 
@@ -21,21 +22,30 @@ onMount(() => {
 	db.appManager.getAll().then((v) => (bots = v));
 });
 
+const id = page.params.id;
+
+let botsFiltered = $derived(
+	bots
+		.filter(v => v.id !== id)
+)
+
+if(!id) redirect(404, "/404")
+
 const sidebarItemsLogic = [
 	{
 		name: "Main file",
 		icon: Bot,
-		href: "/editor/bot",
+		href: resolve("/[id]/editor/bot", { id }),
 	},
 	{
 		name: "Commands",
 		icon: Command,
-		href: "/editor/bot/commands",
+		href: resolve("/[id]/editor/bot/commands", { id }),
 	},
 	{
 		name: "Events",
 		icon: FileTerminal,
-		href: "/editor/bot/events",
+		href: resolve("/[id]/editor/bot/events", { id }),
 	},
 ];
 </script>
@@ -50,7 +60,7 @@ const sidebarItemsLogic = [
 						<Sidebar.MenuButton>
 							<!-- Weird biome sveltekit support -->
 							{#snippet child({ props: _props })}
-								<a href={resolve(`/${page.url.pathname.split("/")[0]}/editor`)} {..._props}>
+								<a href={resolve("/[id]/editor", { id })} {..._props}>
 									<House />
 									General
 								</a>
@@ -85,7 +95,7 @@ const sidebarItemsLogic = [
 						<Sidebar.MenuButton>
 							{#snippet child({ props: _props })}
 								<!-- TODO: Add routes to environment -->
-								<a href={resolve(`/${page.url.pathname.split("/")[0]}/editor`)} {..._props}>
+								<a href={resolve("/[id]/editor/bot/variables", { id })} {..._props}>
 									<Container />
 									Variables
 								</a>
@@ -105,15 +115,15 @@ const sidebarItemsLogic = [
 							<DropdownMenu.Trigger>
 								{#snippet child({ props: _props })}
 									<Sidebar.MenuButton {..._props}>
-										Select Application
+										{bots.find(v => v.id === id)?.name || "Select Application"}
 										<ChevronUp class="ms-auto" />
 									</Sidebar.MenuButton>
 								{/snippet}
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Content class="w-(--bits-dropdown-menu-anchor-width)">
-								{#each bots as bot, i (i)}
+								{#each botsFiltered as bot, i (i)}
 									<DropdownMenu.Item>
-										<a href={resolve(`/${bot.id}/editor`)}>{bot.name}</a>
+										<a href={resolve("/[id]/editor", { id: bot.id })}>{bot.name}</a>
 									</DropdownMenu.Item>
 								{/each}
 							</DropdownMenu.Content>

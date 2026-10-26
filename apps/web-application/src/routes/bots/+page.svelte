@@ -4,7 +4,7 @@ import Bot from "@lucide/svelte/icons/bot";
 import Code from "@lucide/svelte/icons/chevrons-left-right-ellipsis";
 import Rocket from "@lucide/svelte/icons/rocket";
 import { type ComponentProps, onMount } from "svelte";
-import type BotCard from "$lib/Components/BotCard.svelte";
+import BotCard from "$lib/Components/BotCard.svelte";
 import CreateBot from "$lib/Components/Buttons/CreateBot.svelte";
 
 let items: ComponentProps<typeof BotCard>[] = $state([]);

@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Popover as PopoverPrimitive } from "bits-ui";
+import { Popover as PopoverPrimitive } from "bits-ui";
 
 let { ref = $bindable(null), ...restProps }: PopoverPrimitive.CloseProps =
 	$props();

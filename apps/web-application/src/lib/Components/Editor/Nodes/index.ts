@@ -5,3 +5,4 @@ export * from "./Interaction";
 export * from "./Math";
 export * from "./Strings";
 export * from "./Variables";
+export * from "./OnMessage";

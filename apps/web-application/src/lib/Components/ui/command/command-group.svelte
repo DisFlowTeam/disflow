@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type Command as CommandPrimitive, useId } from "bits-ui";
+import { Command as CommandPrimitive, useId } from "bits-ui";
 import { cn } from "$lib/utils.js";
 
 let {

@@ -1,8 +1,8 @@
 <script lang="ts">
-import type { Popover as PopoverPrimitive } from "bits-ui";
+import { Popover as PopoverPrimitive } from "bits-ui";
 import type { ComponentProps } from "svelte";
 import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
-import type PopoverPortal from "./popover-portal.svelte";
+import PopoverPortal from "./popover-portal.svelte";
 
 let {
 	ref = $bindable(null),
