@@ -1,64 +1,71 @@
-import { BaseNode, FlowIOTypes, BaseGenerator } from '@disflow-team/code-gen';
-import { NodeCategoryColor } from '../Colors';
+import {
+	type BaseGenerator,
+	BaseNode,
+	FlowIOTypes,
+} from "@disflow-team/code-gen";
+import { NodeCategoryColor } from "../Colors";
 
 export class ReplaceText extends BaseNode {
-	static title: string = 'Replace Text';
-	static category: string = 'Text Tools';
+	static title: string = "Replace Text";
+	static category: string = "Text Tools";
 	static noFlows: boolean = true;
 
 	protected onBuild(): void {
 		this.setNodeColor(NodeCategoryColor.TextTools);
-		this.addInput('Text', FlowIOTypes.Any);
-		this.addInput('Replace', FlowIOTypes.Any);
-		this.addInput('With', FlowIOTypes.Any);
-		this.addOutput('Text', FlowIOTypes.String);
+		this.addInput("Text", FlowIOTypes.Any);
+		this.addInput("Replace", FlowIOTypes.Any);
+		this.addInput("With", FlowIOTypes.Any);
+		this.addOutput("Text", FlowIOTypes.String);
 
-		this.addProperty('intext', 'Your Text', FlowIOTypes.String);
+		this.addProperty("intext", "Your Text", FlowIOTypes.String);
 		this.addWidget(
-			'text',
-			'In Text',
-			'Your Text',
+			"text",
+			"In Text",
+			"Your Text",
 			(v: string) => {
 				// if(v.trim() === "") this.addInput("content", FlowIOTypes.Any);
 				// else this.removeInput(1);
 				this.properties.intext = v;
 			},
 			{
-				property: 'intext'
-			}
+				property: "intext",
+			},
 		);
 
-		this.addProperty('replace', 'Your', FlowIOTypes.String);
+		this.addProperty("replace", "Your", FlowIOTypes.String);
 		this.addWidget(
-			'text',
-			'Replace',
-			'Your',
+			"text",
+			"Replace",
+			"Your",
 			(v: string) => {
 				this.properties.replace = v;
 			},
 			{
-				property: 'replace'
-			}
+				property: "replace",
+			},
 		);
 
-		this.addProperty('with', 'My', FlowIOTypes.String);
+		this.addProperty("with", "My", FlowIOTypes.String);
 		this.addWidget(
-			'text',
-			'With',
-			'My',
+			"text",
+			"With",
+			"My",
 			(v: string) => {
 				this.properties.with = v;
 			},
 			{
-				property: 'with'
-			}
+				property: "with",
+			},
 		);
 	}
 
 	nodeToCode(generator: BaseGenerator): string {
-		let inText, replace, withText;
+		let inText: string, replace: string, withText: string;
 
-		if (this.inputs[0].link != null && this.getInputDataType(0) == FlowIOTypes.String) {
+		if (
+			this.inputs[0].link != null &&
+			this.getInputDataType(0) === FlowIOTypes.String
+		) {
 			inText = generator.valueToCode(this, 0);
 		} else {
 			inText =
@@ -67,7 +74,10 @@ export class ReplaceText extends BaseNode {
 					: `String(${generator.valueToCode(this, 0)})`;
 		}
 
-		if (this.inputs[1].link != null && this.getInputDataType(1) == FlowIOTypes.String) {
+		if (
+			this.inputs[1].link != null &&
+			this.getInputDataType(1) === FlowIOTypes.String
+		) {
 			replace = generator.valueToCode(this, 1);
 		} else {
 			replace =
@@ -76,7 +86,10 @@ export class ReplaceText extends BaseNode {
 					: `String(${generator.valueToCode(this, 1)})`;
 		}
 
-		if (this.inputs[2].link != null && this.getInputDataType(2) == FlowIOTypes.String) {
+		if (
+			this.inputs[2].link != null &&
+			this.getInputDataType(2) === FlowIOTypes.String
+		) {
 			withText = generator.valueToCode(this, 2);
 		} else {
 			withText =

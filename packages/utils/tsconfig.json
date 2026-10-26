@@ -1,7 +1,7 @@
 {
-    "extends": "@disflow-team/tsconfig/json",
-    "include": ["./src/**/*.ts"],
-    "compilerOptions": {
-        "rootDir": "./src"
-    }
+	"extends": "@disflow-team/tsconfig/json",
+	"include": ["./src/**/*.ts"],
+	"compilerOptions": {
+		"rootDir": "./src"
+	}
 }

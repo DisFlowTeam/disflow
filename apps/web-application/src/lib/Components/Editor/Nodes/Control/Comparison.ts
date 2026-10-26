@@ -1,38 +1,42 @@
-import { BaseGenerator, BaseNode, FlowIOTypes } from '@disflow-team/code-gen';
-import { NodeCategoryColor } from '../Colors';
+import {
+	type BaseGenerator,
+	BaseNode,
+	FlowIOTypes,
+} from "@disflow-team/code-gen";
+import { NodeCategoryColor } from "../Colors";
 
 const controls = {
-	'=': '===',
-	'>': '>',
-	'<': '<',
-	'≥': '>=',
-	'≤': '<=',
-	'≠': '!==',
-	AND: '&&',
-	OR: '||'
+	"=": "===",
+	">": ">",
+	"<": "<",
+	"≥": ">=",
+	"≤": "<=",
+	"≠": "!==",
+	AND: "&&",
+	OR: "||",
 };
 
 export class Compare extends BaseNode {
-	static title: string = 'Comparison';
-	static category: string = 'Control';
+	static title: string = "Comparison";
+	static category: string = "Control";
 	static noFlows: boolean = true;
 
 	protected onBuild(): void {
 		this.setNodeColor(NodeCategoryColor.Control);
-		this.addInput('A', FlowIOTypes.Any);
-		this.addInput('B', FlowIOTypes.Any);
+		this.addInput("A", FlowIOTypes.Any);
+		this.addInput("B", FlowIOTypes.Any);
 
-		this.addProperty('operator', '=', FlowIOTypes.String);
+		this.addProperty("operator", "=", FlowIOTypes.String);
 
 		this.addWidget(
-			'combo',
-			'Operator',
-			'=',
+			"combo",
+			"Operator",
+			"=",
 			(value) => {
-				if (['AND', 'OR'].includes(value)) {
+				if (["AND", "OR"].includes(value)) {
 					this.inputs[0].type = FlowIOTypes.Boolean;
 					this.inputs[1].type = FlowIOTypes.Boolean;
-				} else if (['<', '>', '≥', '≤'].includes(value)) {
+				} else if (["<", ">", "≥", "≤"].includes(value)) {
 					this.inputs[0].type = FlowIOTypes.Number;
 					this.inputs[1].type = FlowIOTypes.Number;
 				} else {
@@ -60,11 +64,11 @@ export class Compare extends BaseNode {
 			},
 			{
 				values: Object.keys(controls),
-				property: 'operator'
-			}
+				property: "operator",
+			},
 		);
 
-		this.addOutput('Boolean', FlowIOTypes.Boolean);
+		this.addOutput("Boolean", FlowIOTypes.Boolean);
 	}
 
 	nodeToCode(generator: BaseGenerator): string {

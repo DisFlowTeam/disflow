@@ -1,48 +1,55 @@
-import { BaseNode, FlowIOTypes, BaseGenerator } from '@disflow-team/code-gen';
-import { NodeCategoryColor } from '../Colors';
+import {
+	type BaseGenerator,
+	BaseNode,
+	FlowIOTypes,
+} from "@disflow-team/code-gen";
+import { NodeCategoryColor } from "../Colors";
 
 export class TextEndsWith extends BaseNode {
-	static title: string = 'Text Ends With';
-	static category: string = 'Text Tools';
+	static title: string = "Text Ends With";
+	static category: string = "Text Tools";
 	static noFlows: boolean = true;
 
 	protected onBuild(): void {
 		this.setNodeColor(NodeCategoryColor.TextTools);
-		this.addInput('Text', FlowIOTypes.Any);
-		this.addInput('Ends With', FlowIOTypes.Any);
-		this.addOutput('Boolean', FlowIOTypes.Boolean);
+		this.addInput("Text", FlowIOTypes.Any);
+		this.addInput("Ends With", FlowIOTypes.Any);
+		this.addOutput("Boolean", FlowIOTypes.Boolean);
 
-		this.addProperty('txt', 'Your Text', FlowIOTypes.String);
+		this.addProperty("txt", "Your Text", FlowIOTypes.String);
 		this.addWidget(
-			'text',
-			'Text',
-			'Your Text',
+			"text",
+			"Text",
+			"Your Text",
 			(v: string) => {
 				this.properties.txt = v;
 			},
 			{
-				property: 'txt'
-			}
+				property: "txt",
+			},
 		);
 
-		this.addProperty('endswith', 'a', FlowIOTypes.String);
+		this.addProperty("endswith", "a", FlowIOTypes.String);
 		this.addWidget(
-			'text',
-			'Starts With',
-			'a',
+			"text",
+			"Starts With",
+			"a",
 			(v: string) => {
 				this.properties.endswith = v;
 			},
 			{
-				property: 'endswith'
-			}
+				property: "endswith",
+			},
 		);
 	}
 
 	nodeToCode(generator: BaseGenerator): string {
-		let txt, endsWith;
+		let txt: string, endsWith: string;
 
-		if (this.inputs[0].link != null && this.getInputDataType(0) == FlowIOTypes.String) {
+		if (
+			this.inputs[0].link != null &&
+			this.getInputDataType(0) === FlowIOTypes.String
+		) {
 			txt = generator.valueToCode(this, 0);
 		} else {
 			txt =
@@ -51,7 +58,10 @@ export class TextEndsWith extends BaseNode {
 					: `String(${generator.valueToCode(this, 0)})`;
 		}
 
-		if (this.inputs[1].link != null && this.getInputDataType(1) == FlowIOTypes.String) {
+		if (
+			this.inputs[1].link != null &&
+			this.getInputDataType(1) === FlowIOTypes.String
+		) {
 			endsWith = generator.valueToCode(this, 1);
 		} else {
 			endsWith =
