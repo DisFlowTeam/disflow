@@ -1,10 +1,24 @@
-import type { BaseNode } from "@disflow-team/code-gen";
+import * as EventRoots from "../Components/Editor/Nodes/Events";
+import type {
+	EventRootClass,
+	NodeClass,
+} from "../Components/Editor/Nodes/types";
 import { DEFAULT_NODES } from "./DefaultNodes";
-import { MESSAGE_NODES } from "./OnMessage";
+import { INTERACTION_NODES } from "./InteractionNodes";
+import { CHANNEL_NODES } from "./OnChannel";
+import { GUILD_NODES } from "./OnGuild";
+import { MEMBER_NODES } from "./OnMember";
+import { MESSAGE_ACTION_NODES, MESSAGE_NODES } from "./OnMessage";
+import { PRESENCE_NODES } from "./OnPresence";
+import { REACTION_NODES } from "./OnReaction";
+import { TYPING_NODES } from "./OnTyping";
+import { USER_NODES } from "./OnUser";
+import { VOICE_NODES } from "./OnVoice";
 
 export interface SupportedEvent {
 	name: string;
-	nodes: (typeof BaseNode)[];
+	root: EventRootClass;
+	nodes: NodeClass[];
 	generatorTemplate: string;
 	intentsRequired?: string[];
 	warn?: string;
@@ -13,16 +27,17 @@ export interface SupportedEvent {
 export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	{
 		name: "Ready",
+		root: EventRoots.OnConnect,
 		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.Ready, async () => {
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.ClientReady, async () => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 	},
 	{
 		name: "Message",
-		// TODO: Add message nodes once they are implemented
+		root: EventRoots.OnMessage,
 		nodes: [...DEFAULT_NODES, ...MESSAGE_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageCreate, async (message) => {
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageCreate, async (disflowMessage) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildMessages", "MessageContent"],
@@ -30,7 +45,8 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Guild Create",
-		nodes: [...DEFAULT_NODES],
+		root: EventRoots.OnGuildCreate,
+		nodes: [...DEFAULT_NODES, ...GUILD_NODES],
 		generatorTemplate: `disflowClient.on(DisflowDJS.Events.GuildCreate, async (guild) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
@@ -39,7 +55,8 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Guild Delete",
-		nodes: [...DEFAULT_NODES],
+		root: EventRoots.OnGuildDelete,
+		nodes: [...DEFAULT_NODES, ...GUILD_NODES],
 		generatorTemplate: `disflowClient.on(DisflowDJS.Events.GuildDelete, async (guild) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
@@ -48,8 +65,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Guild Update",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.GuildUpdate, async (guild) => {
+		root: EventRoots.OnGuildUpdate,
+		nodes: [...DEFAULT_NODES, ...GUILD_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.GuildUpdate, async (oldGuild, newGuild) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["Guilds"],
@@ -57,7 +75,8 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Guild Member Add",
-		nodes: [...DEFAULT_NODES],
+		root: EventRoots.OnGuildMemberAdd,
+		nodes: [...DEFAULT_NODES, ...MEMBER_NODES],
 		generatorTemplate: `disflowClient.on(DisflowDJS.Events.GuildMemberAdd, async (member) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
@@ -66,7 +85,8 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Guild Member Remove",
-		nodes: [...DEFAULT_NODES],
+		root: EventRoots.OnGuildMemberRemove,
+		nodes: [...DEFAULT_NODES, ...MEMBER_NODES],
 		generatorTemplate: `disflowClient.on(DisflowDJS.Events.GuildMemberRemove, async (member) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
@@ -75,8 +95,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Guild Member Update",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.GuildMemberUpdate, async (member) => {
+		root: EventRoots.OnGuildMemberUpdate,
+		nodes: [...DEFAULT_NODES, ...MEMBER_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.GuildMemberUpdate, async (oldMember, newMember) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildMembers"],
@@ -84,7 +105,8 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Channel Create",
-		nodes: [...DEFAULT_NODES],
+		root: EventRoots.OnChannelCreate,
+		nodes: [...DEFAULT_NODES, ...CHANNEL_NODES],
 		generatorTemplate: `disflowClient.on(DisflowDJS.Events.ChannelCreate, async (channel) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
@@ -93,7 +115,8 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Channel Delete",
-		nodes: [...DEFAULT_NODES],
+		root: EventRoots.OnChannelDelete,
+		nodes: [...DEFAULT_NODES, ...CHANNEL_NODES],
 		generatorTemplate: `disflowClient.on(DisflowDJS.Events.ChannelDelete, async (channel) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
@@ -102,8 +125,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Channel Update",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.ChannelUpdate, async (channel) => {
+		root: EventRoots.OnChannelUpdate,
+		nodes: [...DEFAULT_NODES, ...CHANNEL_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.ChannelUpdate, async (oldChannel, newChannel) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["Guilds"],
@@ -111,8 +135,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Channel Pins Update",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.ChannelPinsUpdate, async (channel) => {
+		root: EventRoots.OnChannelPinsUpdate,
+		nodes: [...DEFAULT_NODES, ...CHANNEL_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.ChannelPinsUpdate, async (channel, date) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["Guilds"],
@@ -120,14 +145,16 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Interaction Create",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.InteractionCreate, async (interaction) => {
+		root: EventRoots.OnInteraction,
+		nodes: [...DEFAULT_NODES, ...INTERACTION_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.InteractionCreate, async (disflowCtx) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 	},
 	{
 		name: "Message Delete",
-		nodes: [...DEFAULT_NODES],
+		root: EventRoots.OnMessageDelete,
+		nodes: [...DEFAULT_NODES, ...MESSAGE_ACTION_NODES],
 		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageDelete, async (message) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
@@ -136,8 +163,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Message Reaction Add",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageReactionAdd, async (reaction) => {
+		root: EventRoots.OnMessageReactionAdd,
+		nodes: [...DEFAULT_NODES, ...REACTION_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageReactionAdd, async (reaction, user) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildMessages", "GuildMessageReactions"],
@@ -145,8 +173,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Message Reaction Remove",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageReactionRemove, async (reaction) => {
+		root: EventRoots.OnMessageReactionRemove,
+		nodes: [...DEFAULT_NODES, ...REACTION_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageReactionRemove, async (reaction, user) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildMessages", "GuildMessageReactions"],
@@ -154,8 +183,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Message Reaction Remove All",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageReactionRemoveAll, async (reaction) => {
+		root: EventRoots.OnMessageReactionRemoveAll,
+		nodes: [...DEFAULT_NODES, ...REACTION_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageReactionRemoveAll, async (message, reactions) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildMessages", "GuildMessageReactions"],
@@ -163,7 +193,8 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Message Reaction Remove Emoji",
-		nodes: [...DEFAULT_NODES],
+		root: EventRoots.OnMessageReactionRemoveEmoji,
+		nodes: [...DEFAULT_NODES, ...REACTION_NODES],
 		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageReactionRemoveEmoji, async (reaction) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
@@ -172,8 +203,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Message Update",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageUpdate, async (message) => {
+		root: EventRoots.OnMessageUpdate,
+		nodes: [...DEFAULT_NODES, ...MESSAGE_ACTION_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageUpdate, async (oldMessage, newMessage) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildMessages", "MessageContent"],
@@ -181,8 +213,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Message Delete Bulk",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageDeleteBulk, async (messages) => {
+		root: EventRoots.OnMessageBulkDelete,
+		nodes: [...DEFAULT_NODES, ...MESSAGE_ACTION_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.MessageBulkDelete, async (messages, channel) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildMessages", "MessageContent"],
@@ -190,8 +223,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Voice State Update",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.VoiceStateUpdate, async (state) => {
+		root: EventRoots.OnVoiceStateUpdate,
+		nodes: [...DEFAULT_NODES, ...VOICE_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.VoiceStateUpdate, async (oldState, newState) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildVoiceStates"],
@@ -199,8 +233,9 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Presence Update",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.PresenceUpdate, async (presence) => {
+		root: EventRoots.OnPresenceUpdate,
+		nodes: [...DEFAULT_NODES, ...PRESENCE_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.PresenceUpdate, async (oldPresence, newPresence) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildPresences"],
@@ -208,35 +243,19 @@ export const SUPPORTED_EVENTS: SupportedEvent[] = [
 	},
 	{
 		name: "Typing Start",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.TypingStart, async (user) => {
+		root: EventRoots.OnTypingStart,
+		nodes: [...DEFAULT_NODES, ...TYPING_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.TypingStart, async (typing) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
-		intentsRequired: ["GuildMembers"],
-		warn: 'This event requires the "Guild Members" intent to be toggled in the Discord Developer Portal.',
-	},
-	{
-		name: "User Add",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.UserAdd, async (user) => {
-            {{DISFLOW_GENERATED_CODE}}
-        })`,
-		intentsRequired: ["GuildMembers"],
-		warn: 'This event requires the "Guild Members" intent to be toggled in the Discord Developer Portal.',
-	},
-	{
-		name: "User Remove",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.UserRemove, async (user) => {
-            {{DISFLOW_GENERATED_CODE}}
-        })`,
-		intentsRequired: ["GuildMembers"],
-		warn: 'This event requires the "Guild Members" intent to be toggled in the Discord Developer Portal.',
+		intentsRequired: ["GuildMessageTyping"],
+		warn: 'This event requires the "Guild Message Typing" intent to be toggled in the Discord Developer Portal.',
 	},
 	{
 		name: "User Update",
-		nodes: [...DEFAULT_NODES],
-		generatorTemplate: `disflowClient.on(DisflowDJS.Events.UserUpdate, async (user) => {
+		root: EventRoots.OnUserUpdate,
+		nodes: [...DEFAULT_NODES, ...USER_NODES],
+		generatorTemplate: `disflowClient.on(DisflowDJS.Events.UserUpdate, async (oldUser, newUser) => {
             {{DISFLOW_GENERATED_CODE}}
         })`,
 		intentsRequired: ["GuildMembers"],

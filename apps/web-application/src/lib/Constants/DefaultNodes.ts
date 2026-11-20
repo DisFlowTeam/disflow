@@ -1,5 +1,7 @@
 import * as ConsoleNodes from "../Components/Editor/Nodes/Console";
 import * as ControlNodes from "../Components/Editor/Nodes/Control";
+import * as DiscordNodes from "../Components/Editor/Nodes/Discord";
+import * as EventDataNodes from "../Components/Editor/Nodes/EventData";
 import * as MathsNodes from "../Components/Editor/Nodes/Math";
 import * as StringNodes from "../Components/Editor/Nodes/Strings";
 import * as VariableNodes from "../Components/Editor/Nodes/Variables";
@@ -11,6 +13,8 @@ export function toObjectValues<T>(object: Record<string, T>): T[] {
 export const DEFAULT_NODES = [
 	...toObjectValues(ConsoleNodes),
 	...toObjectValues(ControlNodes),
+	...toObjectValues(DiscordNodes),
+	...toObjectValues(EventDataNodes),
 	...toObjectValues(MathsNodes),
 	...toObjectValues(StringNodes),
 	...toObjectValues(VariableNodes),

@@ -6,9 +6,9 @@ let { children } = $props();
 </script>
 
 <div class="h-full w-full overflow-hidden">
-	<Sidebar.Provider>
+	<Sidebar.Provider class="h-full min-h-0">
 		<AppSidebar />
-		<div>
+		<div class="h-full min-w-0 flex-1 overflow-y-auto">
 			{@render children?.()}
 		</div>
 	</Sidebar.Provider>

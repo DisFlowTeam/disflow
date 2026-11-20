@@ -15,6 +15,11 @@ export enum NodeCategoryColor {
 	Maths = "#2FBF73",
 	TextTools = "#C97A2B",
 	Interaction = "#9e8705",
+	Discord = "#5865F2",
+	EventData = "#8E5ACF",
+	Messages = "#D9822B",
+	Members = "#3BA55D",
+	Channels = "#4E8FE0",
 }
 
 export enum FlowIOColor {

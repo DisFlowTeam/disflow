@@ -19,12 +19,16 @@ export interface ApplicationSchema {
     name: string;
     id: string;
     avatar?: string;
+    description?: string;
     data: Compressed;
     commands: Map<string, {
         name: string;
         description: string;
+        options: CommandOption[];
         data: Compressed;
     }>,
+    events: string[]; // names of enabled Discord events
+    eventData: Map<string, Compressed>; // serialized graph per event handler
     environment: {
         variables: Map<string, string>;
     },
@@ -41,7 +45,7 @@ export interface ApplicationSchema {
 Applications can be managed via the `appManager` property of the return type of `createSingleton`. This instance has the following methods.
 
 ```ts
-export type ApplicationCreationOptions = Omit<ApplicationSchema, "commands" | "environment" | "data" | "lastModified">;
+export type ApplicationCreationOptions = Omit<ApplicationSchema, "commands" | "events" | "eventData" | "environment" | "data" | "lastModified">;
 
 class ApplicationManager {
     create(option: ApplicationCreationOptions): Promise<Application>;
@@ -50,6 +54,50 @@ class ApplicationManager {
     delete(id: string): Promise<boolean>; // returns true if the key existed
 }
 ```
+
+# Command options
+
+Each command stores simple option metadata alongside its graph:
+
+```ts
+type CommandOptionType =
+    | "text"
+    | "integer"
+    | "number"
+    | "boolean"
+    | "user"
+    | "channel"
+    | "role"
+    | "mentionable"
+    | "attachment"
+    | "subcommand"
+    | "subcommand_group";
+
+interface CommandOption {
+    name: string;
+    description: string;
+    type: CommandOptionType;
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    minValue?: number;
+    maxValue?: number;
+    autocomplete?: boolean;
+    choices?: { name: string; value: string }[];
+    channelTypes?: string[];
+    options?: CommandOption[];
+}
+```
+
+Update them with `Application.updateCommandOptions(name, options)`.
+
+Discord structure rules are enforced by the UI/validator:
+
+- top-level arguments and subcommands cannot be mixed
+- subcommand groups can only contain subcommands
+- subcommands can only contain simple arguments
+- groups are top-level only
+- every level supports at most 25 options
 
 # Developing DisFlow data - Rulesets
 

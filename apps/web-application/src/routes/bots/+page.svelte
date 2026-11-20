@@ -1,63 +1,201 @@
 <script lang="ts">
-import { createSingleton } from "@disflow-team/local-data";
+import { type Application, createSingleton } from "@disflow-team/local-data";
 import Bot from "@lucide/svelte/icons/bot";
-import Code from "@lucide/svelte/icons/chevrons-left-right-ellipsis";
-import Rocket from "@lucide/svelte/icons/rocket";
-import { type ComponentProps, onMount } from "svelte";
+import LayoutGrid from "@lucide/svelte/icons/layout-grid";
+import Search from "@lucide/svelte/icons/search";
+import ShieldCheck from "@lucide/svelte/icons/shield-check";
+import { onMount } from "svelte";
 import BotCard from "$lib/Components/BotCard.svelte";
 import CreateBot from "$lib/Components/Buttons/CreateBot.svelte";
+import EmptyState from "$lib/Components/Dashboard/EmptyState.svelte";
+import { Button } from "$lib/Components/ui/button";
+import Input from "$lib/Components/ui/input/input.svelte";
 
-let items: ComponentProps<typeof BotCard>[] = $state([]);
+let apps = $state<Application[]>([]);
+let loading = $state(true);
+let errorMessage = $state<string | null>(null);
+let search = $state("");
 
-async function refreshItems() {
-	const db = createSingleton();
-	items = (await db.appManager.getAll()).map((v) => ({
-		avatar: v.schema.avatar || "./DISFLOW_ICO.png",
-		id: v.id,
-		username: v.name,
-		lastModified: v.schema.lastModified,
-		description: "A DisFlow bot",
-	}));
-}
+const totalCommands = $derived(
+	apps.reduce((total, app) => total + app.schema.commands.size, 0),
+);
+const totalEvents = $derived(
+	apps.reduce((total, app) => total + app.schema.events.length, 0),
+);
+
+const filteredApps = $derived.by(() => {
+	const query = search.trim().toLowerCase();
+
+	if (!query) return apps;
+
+	return apps.filter((app) =>
+		`${app.name} ${app.id}`.toLowerCase().includes(query),
+	);
+});
 
 onMount(() => {
 	void refreshItems();
 });
+
+async function refreshItems() {
+	loading = true;
+	errorMessage = null;
+
+	try {
+		const found = await createSingleton().appManager.getAll();
+
+		apps = found.sort(
+			(a, b) =>
+				new Date(b.schema.lastModified).getTime() -
+				new Date(a.schema.lastModified).getTime(),
+		);
+	} catch (cause) {
+		errorMessage =
+			cause instanceof Error
+				? cause.message
+				: "Unable to load your applications.";
+	} finally {
+		loading = false;
+	}
+}
 </script>
 
-<div class="w-full h-full">
-    <CreateBot refresh={refreshItems} />
-	<div class="h-11/12 w-full">
-		{#if items.length === 0}
-			<div class="h-full w-full flex items-center justify-center">
-				<div class="select-none cursor-default">
-					<img
-						src="/DISFLOW_ICO.png"
-						class="grayscale transition-all hover:opacity-100 rounded-lg opacity-30 h-56 w-56"
-						alt="Disflow icon"
-					/>
-					<p
-						class="text-center mt-3 transition-all hover:text-neutral-300 text-4xl font-serif text-neutral-600"
+<svelte:head>
+	<title>DisFlow · Your bots</title>
+</svelte:head>
+
+<div class="h-full overflow-y-auto">
+	<div
+		class="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 pb-16 sm:p-6 lg:p-8"
+	>
+		<header
+			class="relative overflow-hidden rounded-2xl border border-white/5 bg-card/70 p-6 shadow-sm lg:p-8"
+		>
+			<div
+				class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(59,130,246,0.16),transparent_48%)]"
+			></div>
+
+			<div
+				class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
+			>
+				<div class="flex min-w-0 items-start gap-4">
+					<div
+						class="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-400 lg:size-16"
 					>
-						No Bots found
-					</p>
-					<hr class="mt-1" />
-					<p class="text-center mt-1 transition-all hover:text-neutral-300 text-neutral-500">
-						Click on "New" to create one!
-					</p>
-					<div class="flex gap-2 items-center mt-3 justify-between w-4/6 mx-auto text-neutral-600">
-						<Bot class="transition-all hover:text-neutral-300" />
-						<Code class="transition-all hover:text-neutral-300" />
-						<Rocket class="transition-all hover:text-neutral-300" />
+						<LayoutGrid class="size-6" />
+					</div>
+
+					<div class="min-w-0">
+						<div
+							class="flex flex-wrap items-center gap-2 text-[11px] font-medium tracking-[0.16em] text-muted-foreground uppercase"
+						>
+							<span>DisFlow workspace</span>
+							<span class="size-1 rounded-full bg-muted-foreground/40"></span>
+							<span>Local-first</span>
+						</div>
+						<h1 class="mt-1 text-2xl font-semibold tracking-tight lg:text-3xl">
+							Your bots
+						</h1>
+						<p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+							Create, manage and open your Discord applications. Everything stays
+							on this device.
+						</p>
+						<div class="mt-4 flex flex-wrap gap-2">
+							<span
+								class="rounded-md border border-white/5 bg-white/[0.03] px-2 py-1 text-[11px] font-medium text-muted-foreground"
+							>
+								{loading ? "Loading…" : `${apps.length} ${apps.length === 1 ? "bot" : "bots"}`}
+							</span>
+							<span
+								class="rounded-md border border-white/5 bg-white/[0.03] px-2 py-1 text-[11px] font-medium text-muted-foreground"
+							>
+								{totalCommands} commands
+							</span>
+							<span
+								class="rounded-md border border-white/5 bg-white/[0.03] px-2 py-1 text-[11px] font-medium text-muted-foreground"
+							>
+								{totalEvents} events
+							</span>
+						</div>
 					</div>
 				</div>
+
+				<div class="flex shrink-0 items-center gap-2">
+					<CreateBot refresh={refreshItems} />
+				</div>
 			</div>
+		</header>
+
+		{#if errorMessage}
+			<div
+				class="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+			>
+				{errorMessage}
+			</div>
+		{/if}
+
+		<div
+			class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+		>
+			<div class="relative w-full sm:max-w-xs">
+				<Search
+					class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+				/>
+				<Input
+					bind:value={search}
+					placeholder="Search bots"
+					class="h-10 pl-9"
+				/>
+			</div>
+			<p class="text-xs text-muted-foreground">
+				Showing <span class="font-medium text-foreground"
+					>{filteredApps.length}</span
+				> of {apps.length}
+			</p>
+		</div>
+
+		{#if loading}
+			<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+				{#each [0, 1, 2] as item (item)}
+					<div
+						class="h-56 animate-pulse rounded-xl border border-white/5 bg-white/[0.03]"
+					></div>
+				{/each}
+			</div>
+		{:else if apps.length === 0}
+			<EmptyState
+				icon={Bot}
+				title="No bots yet"
+				description="Create your first DisFlow project by connecting a Discord bot token. It stays encrypted on this device."
+			>
+				<CreateBot refresh={refreshItems} />
+			</EmptyState>
+		{:else if filteredApps.length === 0}
+			<EmptyState
+				icon={Search}
+				title="No matching bots"
+				description="Try a different name or application ID, or clear the search to see every bot."
+			>
+				<Button variant="outline" onclick={() => (search = "")}>
+					Clear search
+				</Button>
+			</EmptyState>
 		{:else}
-			<div class="flex flex-wrap px-5 gap-4 h-full w-full">
-				{#each items as bot, i (i)}
-					<BotCard {...bot} />
+			<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+				{#each filteredApps as bot (bot.id)}
+					<BotCard {bot} />
 				{/each}
 			</div>
 		{/if}
+
+		<div
+			class="flex items-start gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-muted-foreground"
+		>
+			<ShieldCheck class="mt-0.5 size-3.5 shrink-0 text-emerald-400" />
+			<span>
+				DisFlow is local-first. Your bot data, tokens and environment variables
+				stay encrypted on this device.
+			</span>
+		</div>
 	</div>
 </div>

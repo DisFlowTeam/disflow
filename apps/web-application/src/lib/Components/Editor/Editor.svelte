@@ -1,26 +1,26 @@
 <script lang="ts">
+import { FlowIOTypes, OnProgramStartNode } from "@disflow-team/code-gen";
 import { createEditor, getGraph } from "@disflow-team/utils";
-import hljs from "highlight.js";
 import { onMount } from "svelte";
-import "highlight.js/styles/vs.css";
-import javascript from "highlight.js/lib/languages/javascript";
-import json from "highlight.js/lib/languages/json";
 import "litegraph.js/css/litegraph.css";
-import {
-	FlowIOTypes,
-	JavaScriptGenerator,
-	OnProgramStartNode,
-} from "@disflow-team/code-gen";
 import { type LGraph, LGraphCanvas, LiteGraph } from "litegraph.js";
+import { Button } from "$lib/Components/ui/button";
 import * as Nodes from "./Nodes";
 import { FlowIOColor, NodeCategoryColor } from "./Nodes/Colors";
+import type { NodeClass } from "./Nodes/types";
 
 const originalAddItem = LiteGraph.ContextMenu.prototype.addItem;
 
 const {
 	initialLoad,
+	nodes = Object.values(Nodes),
+	root,
+	onSave,
 }: {
 	initialLoad?: ReturnType<LGraph["serialize"]>;
+	nodes?: NodeClass[];
+	root?: NodeClass;
+	onSave?: (data: ReturnType<LGraph["serialize"]>) => void | Promise<void>;
 } = $props();
 
 LiteGraph.ContextMenu.prototype.addItem = function (name, value, options) {
@@ -39,25 +39,10 @@ LiteGraph.ContextMenu.prototype.addItem = function (name, value, options) {
 	return element;
 };
 
-let code = $state("");
-let pkg = $state("");
-
-LiteGraph.clearRegisteredTypes();
-hljs.registerLanguage("javascript", javascript);
-hljs.registerLanguage("json", json);
-
-const engine = new JavaScriptGenerator();
-
-OnProgramStartNode.forEngine(engine);
-LiteGraph.registerNodeType("Events/Start", OnProgramStartNode);
-for (const Node of Object.values(Nodes)) {
-	Node.forEngine(engine);
-	LiteGraph.registerNodeType(Node.buildReferenceName(), Node);
-}
+let saving = $state(false);
+let saveError = $state<string | null>(null);
 
 let canvas: HTMLCanvasElement;
-let dialog: HTMLDialogElement;
-let viewContainer: HTMLDivElement;
 
 let flowColors: Record<string, string> = {};
 
@@ -68,6 +53,28 @@ Object.keys(FlowIOTypes).forEach((v, i) => {
 });
 
 onMount(() => {
+	LiteGraph.clearRegisteredTypes();
+
+	const registeredTypes = new Set<string>(["Events/Start"]);
+
+	LiteGraph.registerNodeType("Events/Start", OnProgramStartNode);
+
+	for (const Node of nodes) {
+		const key = Node.buildReferenceName();
+		if (registeredTypes.has(key)) continue;
+
+		LiteGraph.registerNodeType(key, Node);
+		registeredTypes.add(key);
+	}
+
+	if (root) {
+		const key = root.buildReferenceName();
+		if (!registeredTypes.has(key)) {
+			LiteGraph.registerNodeType(key, root);
+			registeredTypes.add(key);
+		}
+	}
+
 	const rect = canvas.getBoundingClientRect();
 	canvas.width = rect.width;
 	canvas.height = rect.height;
@@ -90,53 +97,63 @@ onMount(() => {
 		// @ts-expect-error Graph contains the "private" property _nodes
 		graph._nodes.length === 0
 	) {
-		const node = new OnProgramStartNode();
+		const start = new OnProgramStartNode();
 
-		node.pos = [canvas.width / 4, canvas.height / 2];
+		if (root) {
+			// graphToCode requires an On Start root; keep it out of the way for
+			// per-event/per-command editors.
+			start.pos = [-1400, -1400];
+			graph.add(start);
 
-		graph.add(node);
+			const eventRoot = new root();
+
+			eventRoot.pos = [canvas.width / 4, canvas.height / 2];
+			graph.add(eventRoot);
+		} else {
+			start.pos = [canvas.width / 4, canvas.height / 2];
+			graph.add(start);
+		}
 	}
 });
+
+async function saveGraph() {
+	if (!onSave) return;
+
+	saving = true;
+	saveError = null;
+
+	try {
+		await onSave(getGraph().serialize());
+	} catch (cause) {
+		saveError =
+			cause instanceof Error ? cause.message : "Unable to save this graph.";
+	} finally {
+		saving = false;
+	}
+}
 </script>
 
-<div class="flex h-[calc(100vh-5rem)] w-screen">
-	<button
-		type="button"
-		class="absolute top-24 right-11 bg-blue-700 rounded-lg p-2"
-		onclick={() => {
-			const c = engine.graphToCode(getGraph());
-
-			const clientCode = `const disflowClient = new DisFlowDJS.Client({ intents: [${c.intents.join(", ")}] })`
-
-			const finalC = `import * as DisFlowDJS from "discord.js";\n${clientCode}\n${c.code}`;
-			code = hljs.highlight(finalC, { language: 'javascript' }).value;
-			const json = c.meta;
-			pkg = hljs.highlight(json, { language: 'json' }).value;
-			dialog.showModal();
-			viewContainer.scrollIntoView({ behavior: "instant" })
-		}}>Generate Code</button
-	>
-	<canvas bind:this={canvas} class="h-full w-screen"></canvas>
+<div class="relative flex h-full w-full">
+	{#if onSave || saveError}
+		<div class="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
+			{#if onSave}
+				<Button
+					variant="outline"
+					size="sm"
+					disabled={saving}
+					onclick={saveGraph}
+				>
+					{saving ? "Saving…" : "Save"}
+				</Button>
+			{/if}
+			{#if saveError}
+				<p
+					class="max-w-xs rounded-md border border-red-500/20 bg-red-500/10 px-2 py-1 text-right text-xs text-red-300"
+				>
+					{saveError}
+				</p>
+			{/if}
+		</div>
+	{/if}
+	<canvas bind:this={canvas} class="h-full w-full"></canvas>
 </div>
-
-<dialog
-	bind:this={dialog}
-	open={false}
-	class="h-[calc(100vh-5rem)] max-w-[100vw] p-3 w-screen absolute top-20 left-0 bg-gray-900"
->
-	<div bind:this={viewContainer} class="w-11/12 h-11/12 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">
-		<pre><code>{@html code}</code></pre>
-	</div>
-	<div class="w-11/12 h-11/12 mt-5 mx-auto rounded-md bg-gray-950 p-3 text-gray-400">
-		<pre><code>{@html pkg}</code></pre>
-	</div>
-	<div class="w-11/12 h-1/12 mx-auto flex items-center">
-		<button
-			type="button"
-			class="bg-blue-700 py-2 px-6 rounded-md"
-			onclick={() => {
-				dialog.close();
-			}}>Close</button
-		>
-	</div>
-</dialog>

@@ -6,12 +6,12 @@ import Command from "@lucide/svelte/icons/command";
 import Container from "@lucide/svelte/icons/container";
 import FileTerminal from "@lucide/svelte/icons/file-terminal";
 import House from "@lucide/svelte/icons/house";
+import { redirect } from "@sveltejs/kit";
 import { onMount } from "svelte";
 import { resolve } from "$app/paths";
 import { page } from "$app/state";
 import * as DropdownMenu from "$lib/Components/ui/dropdown-menu";
 import * as Sidebar from "$lib/Components/ui/sidebar";
-	import { redirect } from "@sveltejs/kit";
 
 const sidebar = Sidebar.useSidebar();
 
@@ -23,6 +23,7 @@ onMount(() => {
 });
 
 const id = page.params.id;
+const currentPath = $derived(page.url.pathname);
 
 let botsFiltered = $derived(
 	bots
@@ -31,11 +32,14 @@ let botsFiltered = $derived(
 
 if(!id) redirect(404, "/404")
 
+const generalHref = resolve("/[id]/editor", { id });
+const variablesHref = resolve("/[id]/editor/bot/variables", { id });
+
 const sidebarItemsLogic = [
 	{
 		name: "Main file",
 		icon: Bot,
-		href: resolve("/[id]/editor/bot", { id }),
+		href: resolve("/[id]/editor/bot/main", { id }),
 	},
 	{
 		name: "Commands",
@@ -57,10 +61,10 @@ const sidebarItemsLogic = [
 				<Sidebar.GroupLabel>Overview</Sidebar.GroupLabel>
 				<Sidebar.Menu>
 					<Sidebar.MenuItem>
-						<Sidebar.MenuButton>
+						<Sidebar.MenuButton isActive={currentPath === generalHref}>
 							<!-- Weird biome sveltekit support -->
 							{#snippet child({ props: _props })}
-								<a href={resolve("/[id]/editor", { id })} {..._props}>
+								<a href={generalHref} {..._props}>
 									<House />
 									General
 								</a>
@@ -74,7 +78,10 @@ const sidebarItemsLogic = [
 				<Sidebar.Menu>
 					{#each sidebarItemsLogic as item, i (i)}
 						<Sidebar.MenuItem>
-							<Sidebar.MenuButton>
+							<Sidebar.MenuButton
+								isActive={currentPath === item.href ||
+									currentPath.startsWith(`${item.href}/`)}
+							>
 								{#snippet child({ props: _props })}
 									<a href={
 										resolve(item.href as unknown as "/")
@@ -92,10 +99,10 @@ const sidebarItemsLogic = [
 				<Sidebar.GroupLabel>Environment</Sidebar.GroupLabel>
 				<Sidebar.Menu>
 					<Sidebar.MenuItem>
-						<Sidebar.MenuButton>
+						<Sidebar.MenuButton isActive={currentPath === variablesHref}>
 							{#snippet child({ props: _props })}
 								<!-- TODO: Add routes to environment -->
-								<a href={resolve("/[id]/editor/bot/variables", { id })} {..._props}>
+								<a href={variablesHref} {..._props}>
 									<Container />
 									Variables
 								</a>

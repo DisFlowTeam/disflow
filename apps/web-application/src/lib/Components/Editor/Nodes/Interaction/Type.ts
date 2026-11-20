@@ -24,7 +24,7 @@ export class InteractionType extends BaseNode {
 			"Type",
 			"Slash",
 			(value) => {
-				this.type = value;
+				this.properties.type = value;
 			},
 			{
 				property: "type",

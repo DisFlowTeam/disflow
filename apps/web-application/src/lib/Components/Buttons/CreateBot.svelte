@@ -1,7 +1,7 @@
 <script lang="ts">
 import { createSingleton } from "@disflow-team/local-data";
 import { SudoMode } from "@disflow-team/utils";
-import { onMount } from "svelte";
+import Plus from "@lucide/svelte/icons/plus";
 import { Button, buttonVariants } from "$lib/Components/ui/button";
 import Input from "$lib/Components/ui/input/input.svelte";
 import * as InputOTP from "$lib/Components/ui/input-otp";
@@ -31,11 +31,6 @@ let otp = $state<string>("");
 
 let creationState = $state<"new" | "confirm" | "digits" | "error">("new");
 
-onMount(() => {
-	const db = createSingleton();
-	db.appManager.getAll().then(console.log);
-});
-
 async function handleFinalCreate() {
 	if (!data || !tokenSaved || !otp) return;
 	const db = createSingleton();
@@ -60,6 +55,7 @@ async function handleFinalCreate() {
 		name: data.username,
 		token: tokenSaved,
 		avatar: data.avatar,
+		description: description.trim() || undefined,
 	});
 
 	creationState = "new";
@@ -97,26 +93,28 @@ async function handleCreate() {
 <Dialog.Root
 	bind:open={isOpen}
 	onOpenChange={(o) => {
-		if(loading) {
+		if (loading) {
 			isOpen = true;
 			return;
-		}; 
-		if (o === false) {
-			console.log(o);
-			creationState = 'new';
-			token = '';
-			description = '';
-			data = undefined;
-			otp = '';
+		}
 
-			console.log($state.snapshot(creationState));
+		if (o === false) {
+			creationState = "new";
+			token = "";
+			description = "";
+			data = undefined;
+			otp = "";
 		}
 	}}
 >
-	<div class="h-1/12 w-full pl-3 flex items-center">
-		<Dialog.Trigger type="button" class={buttonVariants({ variant: 'outline' })}>New</Dialog.Trigger
-		>
-		<Dialog.Content>
+	<Dialog.Trigger
+		type="button"
+		class="inline-flex h-10 items-center gap-2 rounded-md bg-blue-600 px-4 text-sm font-medium text-white shadow-lg shadow-blue-950/40 transition-colors hover:bg-blue-500"
+	>
+		<Plus class="size-4" />
+		New bot
+	</Dialog.Trigger>
+	<Dialog.Content>
 			{#if creationState === 'new'}
 				<Dialog.Header>
 					<Dialog.Title>New Bot</Dialog.Title>
@@ -219,6 +217,5 @@ async function handleCreate() {
 					>
 				</Dialog.Footer>
 			{/if}
-		</Dialog.Content>
-	</div>
+	</Dialog.Content>
 </Dialog.Root>
