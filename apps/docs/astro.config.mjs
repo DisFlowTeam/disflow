@@ -3,6 +3,8 @@ import { defineConfig } from "astro/config";
 import mermaid from "astro-mermaid";
 
 export default defineConfig({
+	site: !process.env.NODE_ENV || process.env.NODE_ENV === "development" ?
+		undefined : "https://docs.disflow.1980s.tech",
 	integrations: [
 		// Must come before Starlight so mermaid code blocks are transformed.
 		mermaid({
