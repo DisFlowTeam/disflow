@@ -9,7 +9,7 @@
 	],
 	"devDependencies": {
 		"@disflow-team/tsconfig": "workspace:^",
-		"happy-dom": "^20.9.0",
+		"happy-dom": "^21.0.4",
 		"litegraph.js": "^0.7.18",
 		"tsup": "^8.5.1",
 		"typescript": "^6.0.2",
