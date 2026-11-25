@@ -67,6 +67,11 @@
 		@apply lg:w-[70%] lg:left-[15%] h-[70%] md:w-[70%] md:left-[15%] lg:top-[15%] md:top-[15%] w-full left-0 z-20;
 	}
 
+	/* canvas element: match the app font */
+	.lgraphcanvas {
+		@apply font-sans!;
+	}
+
 	/* main menu container */
 	.litecontextmenu {
 		@apply bg-[#222222]! border! border-[#444444]! rounded-lg! shadow-2xl! py-1! font-sans! min-w-20!;
@@ -96,6 +101,10 @@
 		@apply border-r-2!;
 	}
 
+	.litecontextmenu .litemenu-title {
+		@apply px-3! py-1! text-xs! font-medium! text-muted-foreground!;
+	}
+
 	/* The search box */
 	.litesearchbox {
 		@apply bg-[#444444]! rounded-sm! text-gray-200!;
@@ -121,8 +130,18 @@
 		@apply rounded-md! px-2! text-center! ml-3! hover:bg-[#404040]! bg-[#444444]! transition-colors! cursor-pointer!;
 	}
 
-	.graphdialog input {
-		@apply rounded-md! bg-[#444444]!;
+	.graphdialog input,
+	.graphdialog textarea {
+		@apply rounded-md! border! border-white/10! bg-[#2a2d33]! px-2! py-1! text-sm! text-foreground! outline-none!;
+	}
+
+	.graphdialog input:focus,
+	.graphdialog textarea:focus {
+		@apply border-blue-500/60!;
+	}
+
+	.graphdialog .name {
+		@apply pr-2! text-xs! text-muted-foreground!;
 	}
 }
 

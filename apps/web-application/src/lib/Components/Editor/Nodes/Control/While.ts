@@ -2,6 +2,7 @@ import {
 	type BaseGenerator,
 	BaseNode,
 	FlowIOTypes,
+	JavaScriptConstantStrings,
 } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
 
@@ -16,8 +17,15 @@ export class While extends BaseNode {
 	}
 
 	nodeToCode(generator: BaseGenerator): string {
-		const cond = generator.valueToCode(this, 0);
-		const out = generator.statementToCode(this, 0);
-		return `while(${cond}) {\n${out}\n}`;
+		// Exec is input/output 0, so the condition is 1 and the loop body is
+		// the "Perform" output, also at 1.
+		const cond = generator.valueToCode(this, 1);
+		const out = generator.statementToCode(this, 1);
+
+		// statementToCode never returns an empty string: an empty body is the
+		// no-op comment, which would loop forever. Break instead.
+		const body = out === JavaScriptConstantStrings.NoOp ? "break" : out;
+
+		return `while(${cond}) {\n${body}\n}`;
 	}
 }

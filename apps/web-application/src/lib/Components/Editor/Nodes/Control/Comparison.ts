@@ -75,6 +75,8 @@ export class Compare extends BaseNode {
 		const a = generator.valueToCode(this, 0);
 		const b = generator.valueToCode(this, 1);
 
-		return `${a} ${controls[this.properties.operator as keyof typeof controls]} ${b}`;
+		// Wrapped so the comparison can be nested in any other expression
+		// (for example `(a || b) && c` or `(a === b) === c`).
+		return `(${a} ${controls[this.properties.operator as keyof typeof controls]} ${b})`;
 	}
 }

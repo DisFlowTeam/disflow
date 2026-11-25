@@ -20,7 +20,7 @@ export interface ApplicationSchema {
     id: string;
     avatar?: string;
     description?: string;
-    data: Compressed;
+    data: Compressed; // serialized main file graph
     commands: Map<string, {
         name: string;
         description: string;
@@ -54,6 +54,19 @@ class ApplicationManager {
     delete(id: string): Promise<boolean>; // returns true if the key existed
 }
 ```
+
+# Main file graph
+
+The main file is a litegraph document stored compressed in `ApplicationSchema.data`. Read and
+write it with:
+
+```ts
+await app.getMainGraph(); // object | undefined
+await app.updateMainGraph(serializedGraph); // also bumps lastModified
+```
+
+Writes are serialized with the `MAIN_DATA` lock. Legacy rows that stored a raw serialized graph in
+`data` are returned as-is.
 
 # Command options
 

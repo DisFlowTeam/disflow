@@ -42,6 +42,6 @@ export class IsInteractionType extends BaseNode {
 		const type =
 			TYPES[this.properties.type as keyof typeof TYPES] ?? TYPES.Slash;
 
-		return `${interaction}?.type === DisFlowDJS.InteractionType.${type}`;
+		return `(${interaction}?.type === DisFlowDJS.InteractionType.${type})`;
 	}
 }

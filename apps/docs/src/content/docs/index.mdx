@@ -1,0 +1,82 @@
+---
+title: DisFlow documentation
+description: Build a Discord bot by connecting blocks — no code required.
+template: splash
+hero:
+  tagline: DisFlow lets you build Discord bots with a visual editor. Connect blocks, save your bot and download it ready to run.
+  actions:
+    - text: Create your first bot
+      link: /getting-started/quick-start/
+      icon: right-arrow
+    - text: See what you can build
+      link: /guides/events/
+      variant: minimal
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+## What is DisFlow?
+
+DisFlow is a visual builder for Discord bots. Instead of writing code, you connect blocks on a
+canvas:
+
+- **Give new members a role** automatically when they join.
+- **Reply to messages** and keywords automatically.
+- **Create slash commands** like `/ping` or `/help`.
+- **Moderate your server** with role management, kicks, bans and timeouts.
+- **Send announcements** with embeds, buttons and files.
+
+When you are happy with your bot, export it and run it on your computer or a server.
+
+## How it works
+
+1. **Add your bot** to DisFlow using its Discord token.
+2. **Build its behaviour** by connecting blocks in the editor.
+3. **Export your bot** and follow the short setup steps to get it online.
+
+No coding experience is needed. If you can connect the dots, you can build a bot.
+
+## Start here
+
+<CardGrid>
+	<LinkCard
+		title="Create your first bot"
+		description="A friendly walkthrough from an empty workspace to a running bot."
+		href="/getting-started/quick-start/"
+	/>
+	<LinkCard
+		title="Learn the editor"
+		description="Move around the canvas, add blocks and save your work."
+		href="/guides/editor/"
+	/>
+	<LinkCard
+		title="Connect blocks"
+		description="Make things happen in order and pass information between blocks."
+		href="/guides/flows/"
+	/>
+	<LinkCard
+		title="Browse all blocks"
+		description="See every block available for messages, members, roles, commands and more."
+		href="/reference/node-catalog/"
+	/>
+	<LinkCard
+		title="Keep your bot online"
+		description="Run it all day on your computer or a hosting service."
+		href="/guides/hosting/"
+	/>
+	<LinkCard
+		title="Troubleshooting"
+		description="Fix offline bots, missing commands, permissions and other common problems."
+		href="/help/troubleshooting/"
+	/>
+</CardGrid>
+
+:::tip[New to Discord bots?]
+The [glossary](/help/glossary/) explains words like server, role, intent and interaction in plain
+language.
+:::
+
+:::note[Just want to run DisFlow?]
+If you are here to get DisFlow running on your own computer or server, see
+[Self-hosting](/self-hosting/).
+:::

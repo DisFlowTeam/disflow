@@ -20,6 +20,10 @@ export enum NodeCategoryColor {
 	Messages = "#D9822B",
 	Members = "#3BA55D",
 	Channels = "#4E8FE0",
+	Embeds = "#A855F7",
+	Components = "#0EA5A5",
+	Data = "#7C9E2E",
+	Database = "#9C6644",
 }
 
 export enum FlowIOColor {

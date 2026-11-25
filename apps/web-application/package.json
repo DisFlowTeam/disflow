@@ -38,6 +38,7 @@
 		"@disflow-team/utils": "workspace:^",
 		"@tailwindcss/vite": "^4.1.18",
 		"highlight.js": "^11.11.1",
+		"jszip": "^3.10.2",
 		"litegraph.js": "^0.7.18",
 		"mode-watcher": "^1.1.0",
 		"tailwindcss": "^4.1.18"

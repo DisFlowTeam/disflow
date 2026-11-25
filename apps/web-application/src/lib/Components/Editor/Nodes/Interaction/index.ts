@@ -1,3 +1,5 @@
+export * from "./AwaitButtonClick";
+export * from "./AwaitMessage";
 export * from "./DeferReply";
 export * from "./DeferUpdate";
 export * from "./DeleteReply";
@@ -14,6 +16,8 @@ export * from "./GetValue";
 export * from "./Interaction";
 export * from "./IsType";
 export * from "./ReplyToInteraction";
+export * from "./RespondToAutocomplete";
+export * from "./ShowModal";
 export * from "./SubcommandMatch";
 export * from "./Type";
 export * from "./UpdateInteraction";

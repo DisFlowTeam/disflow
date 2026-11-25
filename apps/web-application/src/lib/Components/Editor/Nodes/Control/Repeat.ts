@@ -2,6 +2,7 @@ import {
 	type BaseGenerator,
 	BaseNode,
 	FlowIOTypes,
+	JavaScriptConstantStrings,
 } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
 
@@ -29,8 +30,16 @@ export class RepeatNode extends BaseNode {
 	}
 
 	nodeToCode(generator: BaseGenerator): string {
-		const times = generator.valueToCode(this, 0);
+		// Exec is input/output 0, so "Times" and the "Run" body are at 1.
+		const times =
+			this.inputs[1].link == null
+				? (this.properties.times ?? 1)
+				: generator.valueToCode(this, 1);
 
-		return `for(let i = 0; i < ${times || this.properties.times || 1}; i++) {\n${generator.statementToCode(this, 0) || "break"}\n}`;
+		// statementToCode never returns an empty string, so compare against the
+		// no-op marker: an empty loop would otherwise spin forever.
+		const body = generator.statementToCode(this, 1);
+
+		return `for(let i = 0; i < ${times}; i++) {\n${body === JavaScriptConstantStrings.NoOp ? "break" : body}\n}`;
 	}
 }

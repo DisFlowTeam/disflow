@@ -83,10 +83,7 @@ export interface CommandOption {
 
 function normalizeCommandOptions(options: CommandOption[]) {
 	for (const option of options) {
-		if (
-			option.type === "subcommand" ||
-			option.type === "subcommand_group"
-		) {
+		if (option.type === "subcommand" || option.type === "subcommand_group") {
 			option.options ??= [];
 			normalizeCommandOptions(option.options);
 		}
@@ -98,6 +95,9 @@ export interface ApplicationSchema {
 	id: string;
 	avatar?: string;
 	description?: string;
+	/**
+	 * Serialized litegraph data for the bot's main file.
+	 */
 	data: Compressed;
 	commands: Map<
 		string,
@@ -132,6 +132,7 @@ const LOCKS = {
 	COMMAND_PROCESSING: "COMMAND",
 	ENV: "ENV_VAR",
 	EVENT_DATA: "EVENT_DATA",
+	MAIN_DATA: "MAIN_DATA",
 } as const;
 
 export type LOCKS = (typeof LOCKS)[keyof typeof LOCKS];
@@ -232,6 +233,62 @@ export class Application {
 		return appData;
 	}
 
+	// Main file graph
+	async getMainGraph() {
+		const appData = await this.#grabAppDataOrThrow();
+		const data = appData.data;
+
+		if (!data) return undefined;
+
+		// Support legacy rows that stored a raw serialized graph instead of a
+		// compressed value.
+		const raw = data as unknown;
+		if (
+			raw &&
+			typeof raw === "object" &&
+			!Array.isArray(raw) &&
+			"nodes" in raw
+		) {
+			return raw as object;
+		}
+
+		try {
+			return decompress(data);
+		} catch (cause) {
+			console.warn(
+				"[DISFLOW DATA]: Could not decompress the main graph.",
+				cause,
+			);
+			return undefined;
+		}
+	}
+
+	async updateMainGraph(data: object) {
+		await navigator.locks.request(LOCKS.MAIN_DATA, async () => {
+			await this.#grabAppDataOrThrow();
+			let compressed: Compressed;
+
+			try {
+				compressed = compress(cleanForCompression(data) as object);
+			} catch (cause) {
+				throw new Error(
+					`Unable to save the main graph: ${
+						cause instanceof Error ? cause.message : String(cause)
+					}`,
+				);
+			}
+
+			const lastModified = new Date();
+
+			await this.db.applications.update(this.id, {
+				data: compressed,
+				lastModified,
+			});
+			this.schema.data = compressed;
+			this.schema.lastModified = lastModified;
+		});
+	}
+
 	// Command Processing
 	async createCommand(data: Pick<Command, "name" | "description">) {
 		await window.navigator.locks
@@ -255,27 +312,21 @@ export class Application {
 			});
 	}
 
-	async updateCommandOptions(
-		name: string,
-		options: CommandOption[],
-	) {
-		await navigator.locks.request(
-			LOCKS.COMMAND_PROCESSING,
-			async () => {
-				const appData = await this.#grabAppDataOrThrow();
-				const command = appData.commands.get(name);
+	async updateCommandOptions(name: string, options: CommandOption[]) {
+		await navigator.locks.request(LOCKS.COMMAND_PROCESSING, async () => {
+			const appData = await this.#grabAppDataOrThrow();
+			const command = appData.commands.get(name);
 
-				if (!command) throw new Error("That command does not exist.");
+			if (!command) throw new Error("That command does not exist.");
 
-				command.options = options;
-				appData.commands.set(name, command);
+			command.options = options;
+			appData.commands.set(name, command);
 
-				await this.db.applications.update(this.id, {
-					commands: appData.commands,
-				});
-				this.schema.commands = appData.commands;
-			},
-		);
+			await this.db.applications.update(this.id, {
+				commands: appData.commands,
+			});
+			this.schema.commands = appData.commands;
+		});
 	}
 
 	async updateCommandData(name: string, data: object) {

@@ -1,10 +1,23 @@
 import * as MessageNodes from "../Components/Editor/Nodes/Messages";
-import * as OnMessageNodes from "../Components/Editor/Nodes/OnMessage";
+import {
+	Message,
+	MessageAuthor,
+	MessageContent,
+} from "../Components/Editor/Nodes/Messages";
+import type { NodeClass } from "../Components/Editor/Nodes/types";
 import { toObjectValues } from "./DefaultNodes";
 
-export const MESSAGE_NODES = [
-	...toObjectValues(OnMessageNodes),
-	...toObjectValues(MessageNodes),
-] as const;
+const MESSAGE_EVENT_DATA_NODES: NodeClass[] = [
+	Message,
+	MessageAuthor,
+	MessageContent,
+];
 
-export const MESSAGE_ACTION_NODES = [...toObjectValues(MessageNodes)] as const;
+export const MESSAGE_ACTION_NODES = toObjectValues(MessageNodes).filter(
+	(node) => !MESSAGE_EVENT_DATA_NODES.includes(node),
+);
+
+export const MESSAGE_NODES = [
+	...MESSAGE_ACTION_NODES,
+	...MESSAGE_EVENT_DATA_NODES,
+] as const;

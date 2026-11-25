@@ -7,8 +7,12 @@
 	"scripts": {
 		"build": "turbo build",
 		"test": "turbo test",
-		"dev": "turbo build --filter=!web-application && yarn workspace web-application dev",
-		"build:packages": "turbo build --filter=!web-application",
+		"dev": "turbo build --filter=!web-application --filter=!docs && yarn workspace web-application dev",
+		"build:packages": "turbo build --filter=!web-application --filter=!docs",
+		"docs:dev": "yarn workspace docs dev",
+		"docs:build": "yarn workspace docs build",
+		"docs:preview": "yarn workspace docs preview",
+		"docs:check": "yarn workspace docs check",
 		"format-and-lint": "biome check .",
 		"format-and-lint:fix": "biome check . --write"
 	},

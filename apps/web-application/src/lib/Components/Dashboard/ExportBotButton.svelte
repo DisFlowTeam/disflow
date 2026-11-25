@@ -30,7 +30,7 @@ async function exportBot() {
 				.replace(/[^a-z0-9]+/g, "-")
 				.replace(/^-|-$/g, "") || "disflow";
 
-		downloadZip(createZip(project.files), `${slug}-bot`);
+		downloadZip(await createZip(project.files), `${slug}-bot`);
 	} catch (cause) {
 		error =
 			cause instanceof Error ? cause.message : "Unable to export the bot.";

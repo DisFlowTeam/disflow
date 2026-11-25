@@ -58,6 +58,6 @@ export class SubcommandMatch extends BaseNode {
 			TARGETS[this.properties.target as keyof typeof TARGETS] ??
 			TARGETS.Subcommand;
 
-		return `${interaction}?.options.${method}() === ${name}`;
+		return `(${interaction}?.options.${method}() === ${name})`;
 	}
 }

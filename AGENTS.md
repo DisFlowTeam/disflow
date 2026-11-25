@@ -72,24 +72,28 @@ The core idea is a graph walk:
 ```text
 .
 ├── apps/
-│   └── web-application/              # SvelteKit app: editor, bot manager, API route
-│       └── src/
-│           ├── lib/Components/
-│           │   ├── Editor/
-│           │   │   ├── Editor.svelte        # canvas setup + node registration + code dialog
-│           │   │   └── Nodes/               # all concrete nodes, grouped by category
-│           │   ├── ui/                      # generated shadcn-svelte components (do not hand-edit)
-│           │   ├── AppSidebar.svelte
-│           │   ├── BotCard.svelte
-│           │   └── Buttons/CreateBot.svelte
-│           ├── lib/Constants/               # DEFAULT_NODES, MESSAGE_NODES, SUPPORTED_EVENTS
-│           ├── lib/hooks/                   # Svelte 5 helpers (IsMobile)
-│           ├── routes/
-│           │   ├── +page.svelte             # renders the editor directly
-│           │   ├── bots/+page.svelte        # bot list / create bot
-│           │   ├── [id]/editor/...          # per-bot editor shell (some pages are placeholders)
-│           │   └── api/bot/info/+server.ts  # validates a Discord token and returns bot identity
-│           └── app.css                      # Tailwind v4 + theme tokens
+│   ├── web-application/              # SvelteKit app: editor, bot manager, API route
+│   │   └── src/
+│   │       ├── lib/Components/
+│   │       │   ├── Editor/
+│   │       │   │   ├── Editor.svelte        # canvas setup + node registration + code dialog
+│   │       │   │   └── Nodes/               # all concrete nodes, grouped by category
+│   │       │   ├── ui/                      # generated shadcn-svelte components (do not hand-edit)
+│   │       │   ├── AppSidebar.svelte
+│   │       │   ├── BotCard.svelte
+│   │       │   └── Buttons/CreateBot.svelte
+│   │       ├── lib/Constants/               # DEFAULT_NODES, MESSAGE_NODES, SUPPORTED_EVENTS
+│   │       ├── lib/hooks/                   # Svelte 5 helpers (IsMobile)
+│   │       ├── routes/
+│   │       │   ├── +page.svelte             # renders the editor directly
+│   │       │   ├── bots/+page.svelte        # bot list / create bot
+│   │       │   ├── [id]/editor/...          # per-bot editor shell
+│   │       │   └── api/bot/info/+server.ts  # validates a Discord token and returns bot identity
+│   │       └── app.css                      # Tailwind v4 + theme tokens
+│   └── docs/                         # Astro Starlight documentation site (Mermaid diagrams)
+│       ├── astro.config.mjs          # sidebar, logo, social links
+│       ├── src/content/docs/         # Markdown/MDX pages
+│       └── src/styles/custom.css
 ├── packages/
 │   ├── generator/                    # @disflow-team/code-gen
 │   ├── utils/                        # @disflow-team/utils
@@ -109,6 +113,7 @@ The core idea is a graph walk:
 | `packages/data`      | `@disflow-team/local-data`  | Dexie/IndexedDB wrapper, `Application` model, encryption of token/env vars     |
 | `packages/tsconfig`  | `@disflow-team/tsconfig`    | Shared TS config (`.`) and `tsdown` defaults (`./json` export)                 |
 | `apps/web-application` | `web-application` (private) | SvelteKit UI and all concrete node implementations                             |
+| `apps/docs`          | `docs` (private)            | Astro Starlight documentation site                                            |
 
 > Note the naming mismatch: the folder is `generator`, the package is `@disflow-team/code-gen`;
 > the folder is `data`, the package is `@disflow-team/local-data`. Use the package names in imports.
@@ -125,15 +130,19 @@ yarn dev              # build packages, then start the Vite dev server
 
 | Command                       | Effect                                                                  |
 | ----------------------------- | ----------------------------------------------------------------------- |
-| `yarn dev`                    | `turbo build --filter=!web-application`, then `web-application dev`     |
+| `yarn dev`                    | `turbo build --filter=!web-application --filter=!docs`, then `web-application dev` |
 | `yarn build`                  | Build all workspaces                                                     |
-| `yarn build:packages`         | Build only packages (not the web app)                                    |
+| `yarn build:packages`         | Build only packages (not the web app or docs)                            |
 | `yarn test`                   | `turbo test` (currently only `@disflow-team/utils` has tests)            |
 | `yarn format-and-lint`        | `biome check .`                                                          |
 | `yarn format-and-lint:fix`    | `biome check . --write` (organizes imports too)                          |
 | `yarn workspace web-application check` | `svelte-check` against the app's tsconfig                      |
+| `yarn docs:dev`               | Start the Starlight dev server on `http://localhost:4321`                |
+| `yarn docs:build`             | Build the static docs site into `apps/docs/dist`                         |
+| `yarn docs:preview`           | Preview the built docs site                                              |
+| `yarn docs:check`             | `astro check` against the docs project                                   |
 
-The web app runs on Vite's default port, `http://localhost:5173`.
+The web app runs on Vite's default port, `http://localhost:5173`. The docs site runs on `4321`.
 
 **Important build loop:** the app imports the workspace packages from their built `dist/` output.
 After changing `packages/generator`, `packages/utils` or `packages/data`, run `yarn build:packages`
@@ -240,23 +249,27 @@ controlled by `ImportType`: `Object` (`import { A, B }`), `Default` (`import A`)
 
 ### Bot project export
 
-`src/lib/codegen/exportBot.ts` turns saved event and command graphs into a runnable project:
+`src/lib/codegen/exportBot.ts` turns the saved main, event and command graphs into a runnable
+project:
 
+- the main file graph runs once at startup inside `index.js`, before login;
 - each enabled event with a saved graph becomes `events/<camelCaseEvent>.js`;
 - each slash command with a saved graph becomes `commands/<command-name>.js`;
-- `index.js` creates the Discord client, registers every event handler, registers slash commands,
-  dispatches chat-input interactions, and logs in with `DISCORD_TOKEN`;
+- `index.js` creates the Discord client, runs the main file, registers every event handler,
+  registers slash commands, dispatches chat-input interactions, and logs in with
+  `DISCORD_TOKEN`;
 - `package.json` merges dependencies from the generator's `meta`;
 - a README and `.env.example` are included.
 
 Per-file bodies are generated with `JavaScriptGenerator.statementToCode(root, 0)`; listener
 wrappers are replaced by async `execute(disflowClient, ...payload)` exports. Command graphs use the
 `On Command` root and export `{ data, execute }` where `data` is the slash-command name,
-description and option metadata. `src/lib/codegen/zip.ts` builds a dependency-free, store-only ZIP
-in the browser and triggers the download.
+description and option metadata. `src/lib/codegen/zip.ts` builds the archive with JSZip in the
+browser and triggers the download.
 
-> Generator initialisers/cleanups are not extracted into per-event/per-command files yet. If an
-> `Interaction Create` event handler and slash commands both exist, both will run for command
+> Generator initialisers/cleanups are not extracted into per-event/per-command files yet. The main
+> file is the exception: its initialisers are placed in `index.js` and its cleanups are dropped. If
+> an `Interaction Create` event handler and slash commands both exist, both will run for command
 > interactions; keep that in mind when building generic interaction handlers.
 
 ### Persistence and crypto
@@ -266,15 +279,18 @@ in the browser and triggers the download.
 - `createSingleton()` returns a singleton Dexie database named `disflow-data` with one
   `applications` table keyed by `id`.
 - `db.appManager` exposes `create`, `get`, `getAll`, `delete`.
-- `Application` wraps a row and adds `changeToken`, command CRUD (`createCommand`,
-  `updateCommandData`, `getCommand`, `deleteCommand`, `bulkGetCommands`), environment variables
-  (`createVariable`, `deleteVariable`, `exportVariables`) and static `encryptString`/`decryptString`.
-- Graph data (`data`) and per-command data are serialized with `compress-json` (`Compressed`).
+- `Application` wraps a row and adds `changeToken`, the main file graph (`getMainGraph`,
+  `updateMainGraph`), command CRUD (`createCommand`, `updateCommandData`, `getCommand`,
+  `deleteCommand`, `bulkGetCommands`), environment variables (`createVariable`, `deleteVariable`,
+  `exportVariables`) and static `encryptString`/`decryptString`.
+- The main file graph is compressed into `data`; per-command graphs are compressed into each
+  command's `data` field; per-event handler graphs are compressed into
+  `eventData: Map<string, Compressed>`. All use `compress-json` (`Compressed`).
+- `updateMainGraph` also bumps `lastModified`.
 - Enabled Discord event names are stored as a `string[]` on the application row.
-- Per-event handler graphs are compressed and stored in `eventData: Map<string, Compressed>`.
-- Slash-command graphs are compressed into each command's existing `data` field.
 - The bot token and environment-variable values are always encrypted, never stored as plaintext.
-- Writes that race are serialized with `navigator.locks` (`COMMAND`, `ENV_VAR`).
+- Writes that race are serialized with `navigator.locks` (`COMMAND`, `ENV_VAR`, `EVENT_DATA`,
+  `MAIN_DATA`).
 
 Crypto lives in `@disflow-team/utils` and is intentionally not documented in detail here:
 
@@ -292,12 +308,12 @@ Crypto lives in `@disflow-team/utils` and is intentionally not documented in det
 | `/`                            | Marketing landing page with feature overview and workspace CTAs.   |
 | `/bots`                        | Workspace dashboard: stats, search, bot cards and "New Bot" dialog. |
 | `/[id]/editor`                 | General overview: stats, setup checklist, bot details, export.      |
+| `/[id]/editor/bot/main`        | Main file graph editor: startup logic saved to `Application.data`. |
 | `/[id]/editor/bot/commands`    | Slash command dashboard: list, create, search, delete and edit command options. |
 | `/[id]/editor/bot/commands/[command]` | Per-command graph editor with the interaction palette.       |
 | `/[id]/editor/bot/events`      | Event dashboard: browse supported events and toggle handlers.      |
 | `/[id]/editor/bot/events/[event]` | Per-event graph editor with the event's node palette and saved graph. |
 | `/[id]/editor/bot/variables`   | Environment variables: encrypted values, sudo unlock, `.env` export. |
-| `/[id]/editor/bot`, `.../bot/main` | Placeholder pages for the per-bot workspace.                   |
 | `/api/bot/info` (GET)          | Reads `X-Discord-Token`, checks the JWT shape/snowflake, calls Discord `/users/@me`, returns username/id/avatar. |
 
 Creating a bot (`CreateBot.svelte`): validate token via the API route → confirm identity → enter
@@ -318,10 +334,9 @@ All concrete nodes, by category. Each category folder has an `index.ts` barrel; 
 | `Events`      | On Start (from code-gen), On Command (slash command editor) plus gateway roots for guilds, members, channels, messages, reactions, presence, voice, typing and user updates |
 | `Event Data`  | Event Value (exposes payload variables such as `guild`, `member`, `message`, `reaction`)  |
 | `Discord`     | Get Property (safe dotted property access on discord.js objects)                         |
-| `Messages`    | Send Message, Reply To Message, Edit Message, Delete Message, Add Reaction, Send DM       |
+| `Messages`    | Message, Message Content, Message Author, Send Message, Reply To Message, Edit Message, Delete Message, Bulk Delete Messages, Pin Message, Unpin Message, Add Reaction, Remove Reaction, Send DM, Send File, Send Typing |
 | `Members`     | Add Role, Remove Role, Find Role, Kick Member, Ban Member                                |
 | `Channels`    | Delete Channel, Find Channel                                                             |
-| `Message`     | Message Content, Message Author                                                          |
 | `Interaction` | Interaction, Interaction Type, Get int type, Get Interaction Value, Is Interaction Type, Get Command Option, Get Subcommand, Get Subcommand Group, Subcommand Match, Get Focused Option, Get Text Input, Get Selection, Reply To Interaction, Defer Reply, Edit Reply, Delete Reply, Follow Up, Update Interaction, Defer Update |
 
 `src/lib/Constants/DefaultNodes.ts` holds the generic nodes plus the shared Discord helpers
@@ -332,7 +347,9 @@ living in its own `Constants/On<Event>.ts` file. `Constants/OnCommand.ts` expose
 `COMMAND_NODES` (default + interaction nodes) for the slash-command editor.
 `Constants/SupportedEvents.ts` combines `DEFAULT_NODES` with the matching constant for each event
 and declares the event templates and required intents; the events dashboard uses it to render the
-available events and their intent requirements.
+available events and their intent requirements. `Constants/MainNodes.ts` exposes `MAIN_NODES`, the
+startup-safe subset used by the main file editor (Console, Control, Discord, Maths, Text Tools,
+Variables; no event-scoped nodes).
 
 ## Development conventions
 
@@ -429,16 +446,18 @@ two branches) and `Nodes/Control/Repeat.ts` (loop) as reference implementations.
 
 Verify these before relying on them; they are known incomplete areas, not requirements:
 
-- The bot `main` page is still an empty placeholder; the general overview, commands, events and
-  environment dashboards are implemented.
-- Event graphs are stored in `eventData`; command graphs live in the existing
+- The main file page is a working graph editor: it loads and saves the startup graph in
+  `Application.data`, and the export runs that graph in `index.js` before login. The general
+  overview, commands, events and environment dashboards are implemented.
+- Main file and event graphs are stored in `data`/`eventData`; command graphs live in the existing
   `commands[].data` compressed field. Removing a saved handler graph is not implemented yet.
 - Both dashboards export a `.zip` containing `index.js`, `package.json`, `events/*.js` and
   `commands/*.js`. Slash-command options (text, whole/decimal numbers, true/false, users,
   channels, roles, mentionables and attachments, including choices, ranges, autocomplete and
   channel filters) are stored on each command and emitted into the generated command data.
   Commands can also use nested subcommands and subcommand groups; the editor enforces Discord's
-  structural rules. Generator initialisers/cleanups are still outstanding.
+  structural rules. Generator initialisers/cleanups are still outstanding for event and command
+  files; main file initialisers are emitted into `index.js`.
 - Gateway roots exist for every supported catalog event. Event callback parameters are hard-coded
   (`disflowMessage`, `disflowCtx`, `member`, etc.), so the matching `Event Value` options must be
   used inside the right handler.

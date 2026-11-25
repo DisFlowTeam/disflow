@@ -4,6 +4,7 @@ import {
 	FlowIOTypes,
 } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
+import { toIdentifier } from "../helpers";
 
 export class SetVariable extends BaseNode {
 	static title: string = "Set Variable";
@@ -11,7 +12,7 @@ export class SetVariable extends BaseNode {
 
 	protected onBuild(): void {
 		this.setNodeColor(NodeCategoryColor.Variables);
-		this.addProperty("name", "Name", FlowIOTypes.String);
+		this.addProperty("name", "myVariable", FlowIOTypes.String);
 		this.addWidget(
 			"text",
 			"Name",
@@ -21,6 +22,8 @@ export class SetVariable extends BaseNode {
 			},
 			{
 				property: "name",
+				sanitize: toIdentifier,
+				sanitizeLabel: "Variable name",
 			},
 		);
 		this.addInput("Value", FlowIOTypes.Any);
@@ -31,6 +34,6 @@ export class SetVariable extends BaseNode {
 			this.inputs[1].link == null
 				? `undefined`
 				: generator.valueToCode(this, 1);
-		return `${this.properties.name} = ${value};`;
+		return `${toIdentifier(this.properties.name)} = ${value};`;
 	}
 }

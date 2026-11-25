@@ -45,6 +45,6 @@ export class TextLength extends BaseNode {
 					: `String(${generator.valueToCode(this, 0)})`;
 		}
 
-		return `${txt}.length()`;
+		return `${txt}.length`;
 	}
 }

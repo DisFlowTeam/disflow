@@ -1,5 +1,6 @@
 import {
 	type BaseNode,
+	JavaScriptConstantStrings,
 	JavaScriptGenerator,
 	OnProgramStartNode,
 } from "@disflow-team/code-gen";
@@ -7,6 +8,7 @@ import type { Application, CommandOption } from "@disflow-team/local-data";
 import { LGraph, LiteGraph } from "litegraph.js";
 import * as Nodes from "$lib/Components/Editor/Nodes";
 import { OnCommand } from "$lib/Components/Editor/Nodes/Events";
+import { LEGACY_NODE_TYPES } from "$lib/Components/Editor/Nodes/legacy";
 import {
 	SUPPORTED_EVENTS,
 	type SupportedEvent,
@@ -27,6 +29,11 @@ const ALL_NODES = [OnProgramStartNode, ...Object.values(Nodes)];
 function registerLiteGraphNodes() {
 	LiteGraph.clearRegisteredTypes();
 	LiteGraph.registerNodeType("Events/Start", OnProgramStartNode);
+
+	// Old type names first, so the canonical name wins `constructor.type`.
+	for (const [type, Node] of LEGACY_NODE_TYPES) {
+		LiteGraph.registerNodeType(type, Node);
+	}
 
 	for (const Node of Object.values(Nodes)) {
 		LiteGraph.registerNodeType(Node.buildReferenceName(), Node);
@@ -50,6 +57,17 @@ function extractImports(code: string) {
 	if (start === -1 || end === -1 || end < start) return "";
 
 	return code.slice(start + IMPORT_START.length, end).trim();
+}
+
+const PROGRAM_START_MARKER = "// Program Start";
+
+function extractInitialisers(code: string) {
+	const start = code.indexOf(IMPORT_END);
+	const end = code.indexOf(PROGRAM_START_MARKER);
+
+	if (start === -1 || end === -1 || end < start) return "";
+
+	return code.slice(start + IMPORT_END.length, end).trim();
 }
 
 function graphHasNodes(data: unknown) {
@@ -196,10 +214,14 @@ function buildIndexFile(
 	intents: string[],
 	commandImports: string[],
 	commandVariables: string[],
+	mainImports: string[],
+	mainInitialisers: string,
+	mainCode: string,
 ) {
 	const lines = [
 		'import * as DisFlowDJS from "discord.js";',
 		...imports,
+		...mainImports,
 		...commandImports,
 		"",
 		'if (typeof process.loadEnvFile === "function") {',
@@ -216,6 +238,10 @@ function buildIndexFile(
 		"});",
 		"",
 	];
+
+	if (mainInitialisers) lines.push(mainInitialisers, "");
+
+	if (mainCode) lines.push(mainCode, "");
 
 	if (commandVariables.length > 0) {
 		lines.push(
@@ -282,7 +308,8 @@ Generated with DisFlow.
    \`\`\`
 
 Event handlers in \`events/\` and slash commands in \`commands/\` are registered
-automatically by \`index.js\`.
+automatically by \`index.js\`. Startup logic from the main file also runs from
+\`index.js\` before the bot logs in.
 `;
 
 export async function generateBotProject(
@@ -300,6 +327,74 @@ export async function generateBotProject(
 	const commandVariables: string[] = [];
 	let eventCount = 0;
 	let commandCount = 0;
+
+	const mainImports: string[] = [];
+	let mainInitialisers = "";
+	let mainCode = "";
+	const mainData = await app.getMainGraph();
+
+	if (graphHasNodes(mainData)) {
+		const graph = new LGraph();
+		graph.configure(mainData as Parameters<LGraph["configure"]>[0], false);
+
+		const graphNodes = (graph as unknown as { _nodes: BaseNode[] })._nodes;
+
+		const startNodes = graphNodes.filter(
+			(node) => node instanceof OnProgramStartNode,
+		);
+
+		if (startNodes.length === 0) {
+			throw new Error(
+				'The saved main file does not contain the "On Start" root.',
+			);
+		}
+
+		if (startNodes.length > 1) {
+			console.warn(
+				`[DISFLOW EXPORT]: The main file contains ${startNodes.length} "On Start" nodes; exporting every one that is connected.`,
+			);
+		}
+
+		const engine = createEngine();
+		let result: ReturnType<JavaScriptGenerator["graphToCode"]>;
+
+		try {
+			result = engine.graphToCode(graph);
+		} catch (cause) {
+			throw new Error(
+				`Could not generate the main file: ${
+					cause instanceof Error ? cause.message : String(cause)
+				}`,
+			);
+		}
+
+		mainInitialisers = extractInitialisers(result.code);
+
+		mainCode = startNodes
+			.filter((node) => (node.outputs[0]?.links?.length ?? 0) > 0)
+			.map((node) => engine.statementToCode(node, 0))
+			.filter((code) => code !== JavaScriptConstantStrings.NoOp)
+			.join("\n");
+
+		if (!mainCode) {
+			console.warn(
+				"[DISFLOW EXPORT]: The main file has no connected On Start output, so it was not exported.",
+			);
+		}
+
+		const imports = extractImports(result.code);
+		if (imports) mainImports.push(imports);
+
+		for (const intent of result.intents) {
+			const trimmed = intent.trim();
+			if (trimmed) intents.add(trimmed);
+		}
+
+		const meta = JSON.parse(result.meta) as {
+			dependencies?: Record<string, string>;
+		};
+		Object.assign(dependencies, meta.dependencies ?? {});
+	}
 
 	for (const event of SUPPORTED_EVENTS) {
 		if (!enabledEvents.has(event.name)) continue;
@@ -416,6 +511,9 @@ export async function generateBotProject(
 		[...intents].sort(),
 		commandImports,
 		commandVariables,
+		mainImports,
+		mainInitialisers,
+		mainCode,
 	);
 	files["package.json"] = buildPackageJson(dependencies);
 	files["README.md"] = README;

@@ -32,7 +32,7 @@ export class TextEndsWith extends BaseNode {
 		this.addProperty("endswith", "a", FlowIOTypes.String);
 		this.addWidget(
 			"text",
-			"Starts With",
+			"Ends With",
 			"a",
 			(v: string) => {
 				this.properties.endswith = v;

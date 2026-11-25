@@ -1,5 +1,6 @@
 import { BaseNode, FlowIOTypes } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
+import { toIdentifier } from "../helpers";
 
 export class Variable extends BaseNode {
 	static title: string = "Variable";
@@ -18,12 +19,14 @@ export class Variable extends BaseNode {
 			},
 			{
 				property: "name",
+				sanitize: toIdentifier,
+				sanitizeLabel: "Variable name",
 			},
 		);
 		this.addOutput("Value", FlowIOTypes.Any);
 	}
 
 	nodeToCode(): string {
-		return `${this.properties.name || "myVariable"}`;
+		return toIdentifier(this.properties.name);
 	}
 }

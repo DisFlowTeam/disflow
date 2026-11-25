@@ -44,6 +44,24 @@ export class JavaScriptGenerator extends BaseGenerator {
 	private intents = new Set<string>();
 
 	/**
+	 * Drop every piece of cached generation state.
+	 *
+	 * `graphToCode()` does this for you, but it is safe (and recommended) to
+	 * call it when driving `statementToCode()` directly, because the code cache
+	 * is keyed by litegraph node id and ids restart from the beginning in every
+	 * graph. Without a reset, a second graph can be served code generated for a
+	 * different node with the same id.
+	 */
+	reset() {
+		this.imports.clear();
+		this.visitedNodes.clear();
+		this.codeCache.clear();
+		this.initialisers.clear();
+		this.cleanupCode.clear();
+		this.intents.clear();
+	}
+
+	/**
 	 * Generate code by walking up the input of a node.
 	 * @param node The node you want to start the walk-up from
 	 * @param inputIndex The input index of the input you want to walk from
@@ -201,6 +219,10 @@ export class JavaScriptGenerator extends BaseGenerator {
 		meta: string;
 		intents: string[];
 	} {
+		// Start from a clean slate so a reused generator never serves code
+		// cached for a previous graph.
+		this.reset();
+
 		const codeString: string[] = [];
 
 		// @ts-expect-error need to get all nodes. Could not find any public API to do so (even though there should be one there)
@@ -269,12 +291,7 @@ export class JavaScriptGenerator extends BaseGenerator {
 		);
 
 		// reset all the cache
-		this.imports.clear();
-		this.visitedNodes.clear();
-		this.codeCache.clear();
-		this.initialisers.clear();
-		this.cleanupCode.clear();
-		this.intents.clear();
+		this.reset();
 
 		return {
 			code: `${imports}\n\n${initialisers.trimEnd()}\n\n${codeString.join("\n")}\n\n${cleanups}`,

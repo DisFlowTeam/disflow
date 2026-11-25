@@ -4,6 +4,7 @@ import {
 	FlowIOTypes,
 } from "@disflow-team/code-gen";
 import { NodeCategoryColor } from "../Colors";
+import { toIdentifier } from "../helpers";
 
 const controls = {
 	let: "let",
@@ -44,13 +45,15 @@ export class CreateVariable extends BaseNode {
 			},
 			{
 				property: "name",
+				sanitize: toIdentifier,
+				sanitizeLabel: "Variable name",
 			},
 		);
 	}
 
 	nodeToCode(generator: BaseGenerator): string {
 		const keyword = controls[this.properties.keyword as keyof typeof controls];
-		const name = this.properties.name || "myVariable";
+		const name = toIdentifier(this.properties.name);
 		const valueInput = this.inputs[1];
 		const hasValue = valueInput?.link != null;
 

@@ -10,7 +10,7 @@ const CAPTURE = "%{{DISFLOW_CODE_MATH_FUNC}}";
 const codes = {
 	"square root": `Math.sqrt(${CAPTURE})`,
 	absolute: `Math.abs(${CAPTURE})`,
-	"-": `-Math.abs(${CAPTURE})`,
+	"-": `(-Math.abs(${CAPTURE}))`,
 	ln: `Math.log(${CAPTURE})`,
 	log10: `Math.log10(${CAPTURE})`,
 	"e^": `Math.exp(${CAPTURE})`,
