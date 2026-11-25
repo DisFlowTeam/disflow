@@ -116,6 +116,6 @@ We welcome contributions! Please follow these steps:
 If you have questions or need help:
 
 - Open an issue on GitHub
-- Join our Discord community (link coming soon)
+- Join our [Discord community](https://discord.gg/Pe2UNfvkkf)
 - Check the documentation in [`apps/docs/`](apps/docs/) (run `yarn docs:dev`)
 
