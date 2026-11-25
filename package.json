@@ -21,7 +21,7 @@
 		"tsdown": "^0.21.7",
 		"turbo": "^2.6.3",
 		"typescript": "^6.0.2",
-		"vitest": "^4.1.6"
+		"vitest": "^4.1.11"
 	},
 	"private": true,
 	"workspaces": [
