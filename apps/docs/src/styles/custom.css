@@ -1,0 +1,16 @@
+:root {
+	--sl-color-accent-low: #dbeafe;
+	--sl-color-accent: #2563eb;
+	--sl-color-accent-high: #172554;
+}
+
+:root[data-theme="dark"] {
+	--sl-color-accent-low: #172554;
+	--sl-color-accent: #6ba6e8;
+	--sl-color-accent-high: #dbeafe;
+}
+
+/* Keep the brand mark from dominating the header. */
+.site-title img {
+	height: 1.75rem;
+}

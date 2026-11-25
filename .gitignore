@@ -1,6 +1,9 @@
 # Turbo
 .turbo
 
+# Astro
+.astro/
+
 # Logs
 logs
 *.log

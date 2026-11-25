@@ -1,32 +1,35 @@
 {
-    "name": "@disflow-team/utils",
-    "version": "0.0.1",
-    "description": "A set of utilities used by DisFlow",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "files": [
-        "dist/"
-    ],
-    "devDependencies": {
-        "@disflow-team/tsconfig": "workspace:^",
-        "litegraph.js": "^0.7.18",
-        "tsup": "^8.5.1",
-        "typescript": "^6.0.2"
-    },
-    "scripts": {
-        "build": "tsdown --config ./tsdown.config.ts",
-        "lint": "eslint src --ext .ts --fix",
-        "prettier": "prettier --write .",
-        "prettier:check": "prettier --check ."
-    },
-    "exports": {
-        ".": {
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.cjs",
-            "types": {
-                "import": "./dist/index.d.mts",
-                "require": "./dist/index.d.cts"
-            }
-        }
-    }
+	"name": "@disflow-team/utils",
+	"version": "0.0.1",
+	"description": "A set of utilities used by DisFlow",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist/"
+	],
+	"devDependencies": {
+		"@disflow-team/tsconfig": "workspace:^",
+		"happy-dom": "^20.9.0",
+		"litegraph.js": "^0.7.18",
+		"tsup": "^8.5.1",
+		"typescript": "^6.0.2",
+		"vitest": "^4.1.6"
+	},
+	"scripts": {
+		"build": "tsdown --config ./tsdown.config.ts",
+		"lint": "eslint src --ext .ts --fix",
+		"prettier": "prettier --write .",
+		"prettier:check": "prettier --check .",
+		"test": "vitest run"
+	},
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs",
+			"types": {
+				"import": "./dist/index.d.mts",
+				"require": "./dist/index.d.cts"
+			}
+		}
+	}
 }

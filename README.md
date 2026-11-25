@@ -74,6 +74,7 @@ The web application will be available at `http://localhost:5173` (default Vite p
 ## Project Structure
 
 - [`apps/web-application/`](apps/web-application/) - SvelteKit frontend application with the visual editor
+- [`apps/docs/`](apps/docs/) - Astro Starlight documentation site (run it with `yarn docs:dev`)
 - [`packages/generator/`](packages/generator/) - Code generation module that extends litegraph.js capabilities. Please view its [README](packages/generator/README.md) if you would like to develop nodes for DisFlow or adapt the generator into your own litegraph applications
 - [`packages/utils/`](packages/utils/) - Shared utility functions and workspace management tools
 - [`packages/tsconfig/`](packages/tsconfig/) - Shared TypeScript configuration for consistent builds
@@ -84,9 +85,10 @@ The web application will be available at `http://localhost:5173` (default Vite p
 
 - `yarn build` - Build all packages and applications
 - `yarn dev` - Start development mode (builds packages and starts web app)
+- `yarn docs:dev` - Start the documentation site on port 4321
 - `yarn test` - Run tests across all workspaces
-- `yarn lint` - Lint all code
-- `yarn prettier` - Format code with Prettier
+- `yarn format-and-lint` - Run biome to check files for formatting and linting errors
+- `yarn format-and-lint:fix` - Run biome to check *and fix* formatting and linting errors when it can
 
 ### Building Packages
 
@@ -103,9 +105,11 @@ We welcome contributions! Please follow these steps:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Make some changes
+4. Lint your changes via `yarn format-and-lint:fix`
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## Support
 
@@ -113,5 +117,5 @@ If you have questions or need help:
 
 - Open an issue on GitHub
 - Join our Discord community (link coming soon)
-- Check the documentation (coming soon)
+- Check the documentation in [`apps/docs/`](apps/docs/) (run `yarn docs:dev`)
 

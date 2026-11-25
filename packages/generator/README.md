@@ -29,7 +29,61 @@ These two are methods that nodes will use to generate code for their branches. T
 
 # Code Generation
 
-Before doing anything, you need to register the node with the respective code generation engine. This can be done using the method `BaseNode.forEngine(<BaseEngine>)`. After registering the nodes, you can call `<BaseGenerator>.graphToCode(litegraphInstance)` to generate your code. This will return an object with the type `{ code: string, meta: string, intents: string }`. It is up to the developer on how they want to implement intents and package requirements with intents being a JSON stringified version of Discord.js' intents.
+Before doing anything, you need to register the node with the respective code generation engine. This can be done using the method `BaseNode.forEngine(<BaseGenerator>)`. After registering the nodes, you can call `<BaseGenerator>.graphToCode(litegraphInstance)` to generate your code. This will return an object with the type `{ code: string, meta: string, intents: string }`. It is up to the developer on how they want to implement intents and package requirements with intents being an array of Discord intents.
+
+# Basic node implementation
+
+A basic node can be implemented as the following. Let us look at a simple node that ouputs `console.log()`.
+
+```ts
+import { BaseGenerator, BaseNode, FlowIOTypes } from '@disflow-team/code-gen';
+import { NodeCategoryColor } from '../Colors';
+
+export class Print extends BaseNode {
+	static title: string = 'Print';
+	static category: string = 'Console';
+
+	protected onBuild(): void {
+		this.setNodeColor(NodeCategoryColor.Console);
+		this.addInput('Content', FlowIOTypes.Any);
+		this.addProperty('content', '', FlowIOTypes.String);
+
+		this.addWidget(
+			'text',
+			'Content',
+			'',
+			(v: string) => {
+				if (v.trim() === '' && !this.inputs.at(1)) this.addInput('content', FlowIOTypes.Any);
+				else if (this.inputs.at(1)) this.removeInput(1);
+
+				this.properties.content = v;
+			},
+			{
+				property: 'content'
+			}
+		);
+	}
+
+	nodeToCode(generator: BaseGenerator): string {
+		const printValue =
+			this.inputs[1].link == null
+				? JSON.stringify(this.properties.content)
+				: generator.valueToCode(this, 1);
+
+		return `console.log(${printValue});`;
+	}
+}
+```
+
+Note the use of `valueToCode()` from the instance of `BaseGenerator`. Let's we are connected this node's input to an "add" node that adds two numbers together. If this is the case, `valueToCode()` will walk to each node that is connected to the input **recursively up the input chain** until it can no longer fine the inputs (generating code for each along the way). Let us see how to register this node for the `JavaScriptGenerator` class.
+
+```ts
+import { Print } from "./print.ts";
+
+const generator = new JavaScriptGenerator();
+// register to the JavaScriptGenerator's cache for code generation.
+Print.forEngine(generator);
+```
 
 # Todos
 

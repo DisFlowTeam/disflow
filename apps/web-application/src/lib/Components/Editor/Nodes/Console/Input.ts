@@ -1,59 +1,68 @@
-import { BaseGenerator, BaseNode, FlowIOTypes, ImportType } from '@disflow-team/code-gen';
-import { NodeCategoryColor } from '../Colors';
-
-const INITIALISER = `
-const disflowInternalReadlineMod = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-`.trim();
-
-const CLEANUP = 'disflowInternalReadlineMod.close();';
+import {
+	type BaseGenerator,
+	BaseNode,
+	FlowIOTypes,
+	ImportType,
+} from "@disflow-team/code-gen";
+import { NodeCategoryColor } from "../Colors";
 
 export class Input extends BaseNode {
-	static title: string = 'Input';
-	static category: string = 'Console';
+	static title: string = "Input";
+	static category: string = "Console";
 
 	static noFlows: boolean = true;
 
 	protected onBuild(): void {
 		this.setNodeColor(NodeCategoryColor.Console);
-		this.addInput('Question', FlowIOTypes.Any);
-		this.addProperty('question', '', FlowIOTypes.String);
+		this.addInput("Question", FlowIOTypes.Any);
+		this.addProperty("question", "", FlowIOTypes.String);
 
 		this.addWidget(
-			'text',
-			'Question',
-			'',
+			"text",
+			"Question",
+			"",
 			(v: string) => {
-				if (v.trim() === '' && !this.inputs.at(1)) this.addInput('Question', FlowIOTypes.Any);
-				else if (this.inputs.at(1)) this.removeInput(1);
-
+				// This node has no exec pins, so "Question" is input 0 and
+				// always exists. The widget is only the fallback value.
 				this.properties.question = v;
 			},
 			{
-				property: 'question'
-			}
+				property: "question",
+			},
 		);
 
-		this.addOutput('Answer', FlowIOTypes.String);
+		this.addOutput("Answer", FlowIOTypes.String);
 
 		this.addImport({
 			type: ImportType.Everything,
-			module: 'readline',
-			from: 'node:readline/promises',
-			packageVersion: '*',
+			module: "readline",
+			from: "node:readline/promises",
+			packageVersion: "*",
 			isFromNodeJS: true,
-			initialiser: INITIALISER,
-			cleanup: CLEANUP
 		});
 	}
 
 	nodeToCode(generator: BaseGenerator): string {
-		const printValue = !this.inputs[1]?.link
-			? JSON.stringify(this.properties.question)
-			: generator.valueToCode(this, 1);
+		// No implicit exec pins on this node, so the question is input 0.
+		const question =
+			this.inputs[0].link == null
+				? JSON.stringify(this.properties.question)
+				: generator.valueToCode(this, 0);
 
-		return `(await disflowInternalReadlineMod.question(${printValue}))`;
+		// Self-contained on purpose: generator initialisers are only emitted
+		// into the main file, so a module-level readline interface would be
+		// missing from event and command files. Creating and closing it per
+		// call also keeps working when a handler runs more than once.
+		return `(await (async () => {
+	const disflowReadline = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+	try {
+		return await disflowReadline.question(${question});
+	} finally {
+		disflowReadline.close();
+	}
+})())`;
 	}
 }

@@ -1,22 +1,8 @@
-import { RootNode, FlowIOTypes, BaseGenerator } from "@disflow-team/code-gen";
-import { NodeCategoryColor } from "../Colors";
+import { DiscordEventRoot } from "./DiscordEventRoot";
 
-export class OnMessage extends RootNode {
-    static title: string = "On Message";
-    static category: string = "Events";
-    static noFlows: boolean = true;
-
-    protected onBuild(): void {
-        this.setNodeColor(NodeCategoryColor.Events);
-
-        this.indentExecutionFlow(true);
-        this.addOutput("run", FlowIOTypes.Flow);
-		this.addIntent("MessageContent");
-		this.addIntent("GuildMessages")
-    }
-
-    nodeToCode(generator: BaseGenerator): string {
-        return `client.on(DisFlowDJS.Events.MessageCreate, (disflowMessage) => {\n${generator.statementToCode(this, 0)}\n});`;
-    }
+export class OnMessage extends DiscordEventRoot {
+	static title = "On Message";
+	static eventName = "MessageCreate";
+	static payload = "disflowMessage";
+	static requiredIntents = ["MessageContent", "GuildMessages"];
 }
-
