@@ -11,7 +11,7 @@ difference is the key to building almost anything in DisFlow.
 Connections that control the order of events are shown as arrows between the right side of one
 block and the left side of the next.
 
-![Message Reply Diagram](/public/MESSAGE_REPLY_PONG.png)
+![Message Reply Diagram](/MESSAGE_REPLY_PONG.png)
 
 The blocks run from left to right, one after another. This is how you say “when this happens, do
 that”.
@@ -24,7 +24,7 @@ control block such as **If** or **Switch** to choose a path.
 The other kind of connection carries a value — text, a number, a member, a message, and so on.
 These connections usually go from the right side of one block into the left side of another.
 
-![Passing Data Diagram](/public/PASSING_INFO.png)
+![Passing Data Diagram](/PASSING_INFO.png)
 
 Here, the text block provides the message content, and the "reply to message block" sends it.
 
@@ -39,7 +39,7 @@ This graph replies to every message:
 2. **Event Value** provides the `message`.
 3. **Reply To Message** answers it with your text.
 
-![Complete example](/public/COMPLETE_EXAMPLE.png)
+![Complete example](/COMPLETE_EXAMPLE.png)
 
 You can use the same message in several blocks. For example, **Get Property** can read
 `author.username` to personalise the reply.

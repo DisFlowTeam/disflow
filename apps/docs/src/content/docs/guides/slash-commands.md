@@ -113,7 +113,7 @@ an external service — start with **Defer Reply**, then use **Edit Reply** when
 4. Set the reply text to `Pong! bot is online!`.
 5. **Save**.
 
-![Ping slash example](/public/PING_EXAMPLE.png)
+![Ping slash example](/PING_EXAMPLE.png)
 
 ## If Interaction Create is also on
 
